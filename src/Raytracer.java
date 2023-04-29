@@ -19,7 +19,7 @@ public class Raytracer {
 
 
     public void init(){
-        cam_Image = new Camera_ImageLayer(1280, 800, 1);
+        cam_Image = new Camera_ImageLayer(1280, 800);
 
         this.objects.add(new Sphere(0xFF00FFFF, new VectorF(0,0,-5f), 1));
         this.objects.add(new Sphere(0xFFFF0000, new VectorF(2,-2,-7f), 1));
