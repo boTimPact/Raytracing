@@ -16,7 +16,7 @@ public class LightSource {
         VectorF normal = figure.getNormal(point);
 
         float intensity = normal.dot(lightDirection.normalize().negate());
-        VectorF light = figure.color.multiplyScalar(brightness * (intensity / (lightDirection.magnitude() * lightDirection.magnitude() + 1)));
+        VectorF light = figure.color.multiplyScalar(intensity * (brightness / (lightDirection.magnitude() * lightDirection.magnitude() + 1)));
         light.x = Math.max(Math.min(light.x, 255), 0);
         light.y = Math.max(Math.min(light.y, 255), 0);
         light.z = Math.max(Math.min(light.z, 255), 0);
