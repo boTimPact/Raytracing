@@ -5,6 +5,11 @@ public class Camera_ImageLayer {
     public VectorF cameraRight;   //right
     public VectorF cameraViewDirection;   //viewDirection
 
+    float aspectRatioX;
+    float aspectRatioY;
+    int imageWidth;
+    int imageHeight;
+
     //Image Layer
     //private float distanceImage_Camera;
     private VectorF imageBottomLeftCorner;
@@ -15,26 +20,17 @@ public class Camera_ImageLayer {
         this.cameraUp = new VectorF(1,0,0);
         this.cameraRight = new VectorF(0,1,0);
         this.cameraViewDirection = new VectorF(0,0,-1);
+        this.imageWidth = imageWidth;
+        this.imageHeight = imageHeight;
 
-        //this.distanceImage_Camera = distanceImage_Camera;
-        this.imageBottomLeftCorner = cameraViewDirection.add(cameraRight.negate().multiplyScalar(imageWidth/2).add(cameraUp.negate().multiplyScalar(imageHeight/2)));
+        this.aspectRatioX = imageWidth / (float)imageHeight;
+        this.aspectRatioY = (imageHeight * aspectRatioX) / imageWidth;
 
-//        System.out.println("N:   X: " + n.x + " Y: " + n.y + " Z: " + n.z);
-//        System.out.println("V:   X: " + v.x + " Y: " + v.y + " Z: " + v.z);
-//        System.out.println("U:   X: " + u.x + " Y: " + u.y + " Z: " + u.z);
+
+        this.imageBottomLeftCorner = cameraViewDirection.add(cameraRight.negate().multiplyScalar(aspectRatioX * 0.5f).add(cameraUp.negate().multiplyScalar(aspectRatioY * 0.5f)));
     }
 
-    public Ray rayToImageLayer(float x, float y){
-        Ray ray = new Ray(this.pos, imageBottomLeftCorner.add(cameraRight.multiplyScalar(x)).add(cameraUp.multiplyScalar(y)));
-        return ray;
+    public Ray rayToImageLayer(float x, float y, int width, int height){
+        return new Ray(this.pos, imageBottomLeftCorner.add(cameraRight.multiplyScalar(x * (aspectRatioX / width))).add(cameraUp.multiplyScalar(y * (aspectRatioY / height))));
     }
-
-
-
-
-//
-//    public Matrix4f toMatrix(){
-//        Matrix4f view = new Matrix4f(pos, u.negate(), v, n);
-//        return view;
-//    }
 }

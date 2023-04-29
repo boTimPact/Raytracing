@@ -4,6 +4,8 @@ import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.image.DirectColorModel;
 import java.awt.image.MemoryImageSource;
+import java.util.LinkedList;
+import java.util.List;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -11,17 +13,17 @@ import javax.swing.JLabel;
 
 
 public class Raytracer {
-    public int resX;
-    public int resY;
     public Camera_ImageLayer cam_Image;
 
-
+    List<Figure> objects = new LinkedList<>();
 
 
     public void init(){
-        this.resX = 1280;
-        this.resY = 832;
-        cam_Image = new Camera_ImageLayer(resX, resY, 1);
+        cam_Image = new Camera_ImageLayer(1280, 800, 1);
+
+        this.objects.add(new Sphere(0xFF00FFFF, new VectorF(0,0,-5f), 1));
+        this.objects.add(new Sphere(0xFFFF0000, new VectorF(2,-2,-7f), 1));
+        this.objects.add(new Sphere(0xFF0000FF, new VectorF(1.4f,2.6f,-8f), 2));
 
         //do{
             update();
@@ -30,15 +32,24 @@ public class Raytracer {
     }
 
     public void update(){
+        int resX = cam_Image.imageWidth;
+        int resY = cam_Image.imageHeight;
         int[] pixels = new int[resX * resY];
 
         for (int y = 0; y < resY; ++y){
             for (int x = 0; x < resX; ++x) {
-                Ray ray = cam_Image.rayToImageLayer(x, y);
-                Sphere sphere = new Sphere(new VectorF(0,0,255), new VectorF(0,0,-1.00001f), 1);
-                float intersection = sphere.intersects(ray);
-                if(intersection > 0) {
-                    pixels[y * resX + x] = (0xFF << 24) | (0x00 << 16) | (0x00 << 8) | 0xFF;
+                Ray ray = cam_Image.rayToImageLayer(x, y, resX, resY);
+                int index = -1;
+                float intersection = Float.POSITIVE_INFINITY;
+                for (int i = 0; i < objects.size(); i++) {
+                    float tmp = objects.get(i).intersects(ray);
+                    if(Float.isFinite(tmp) && tmp < intersection){
+                        intersection = tmp;
+                        index = i;
+                    }
+                }
+                if(index >= 0) {
+                    pixels[y * resX + x] = objects.get(index).color;
                 }else {
                     pixels[y * resX + x] = 0xFF888888;
                 }
