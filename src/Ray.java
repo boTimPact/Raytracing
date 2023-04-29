@@ -8,4 +8,8 @@ public class Ray {
     }
 
     public Ray(){}
+
+    public VectorF pointOnRay(float s){
+        return origin.add(direction.normalize().multiplyScalar(s));
+    }
 }

@@ -4,7 +4,7 @@ public class Sphere extends  Figure{
 
     public float radius;
 
-    public Sphere(int color, VectorF mid, float radius){
+    public Sphere(VectorF color, VectorF mid, float radius){
         super.color = color;
         this.mid = mid;
         this.radius = radius;
@@ -28,5 +28,10 @@ public class Sphere extends  Figure{
         //(-b – [Vorzeichen von b] * √(b2 – 4ac))/2
         float k = (float) (-b - Math.signum(b) * Math.sqrt(b * b - 4 * a * c)) / 2;
         return Math.min(c/k, k/a);
+    }
+
+    @Override
+    public VectorF getNormal(VectorF point){
+        return point.add(this.mid.negate()).normalize();
     }
 }

@@ -5,13 +5,11 @@ public class Camera_ImageLayer {
     public VectorF cameraRight;   //right
     public VectorF cameraViewDirection;   //viewDirection
 
+    //Image Layer
     float aspectRatioX;
     float aspectRatioY;
     int imageWidth;
     int imageHeight;
-
-    //Image Layer
-    //private float distanceImage_Camera;
     private VectorF imageBottomLeftCorner;
 
 

@@ -26,6 +26,11 @@ public class VectorF {
     }
 
 
+    public float magnitude(){
+        return (float) Math.sqrt(x*x + y*y + z*z);
+    }
+
+
     public VectorF negate(){
         VectorF out = new VectorF(this.x,this.y,this.z);
         out.x = -this.x;

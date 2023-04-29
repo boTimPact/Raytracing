@@ -13,28 +13,57 @@ import javax.swing.JLabel;
 
 
 public class Raytracer {
-    public Camera_ImageLayer cam_Image;
 
+    public Camera_ImageLayer cam_Image;
     List<Figure> objects = new LinkedList<>();
+    LightSource light;
+
+    JFrame frame;
+    JLabel imageLabel;
+    MemoryImageSource image;
 
 
     public void init(){
         cam_Image = new Camera_ImageLayer(1280, 800);
+        light = new LightSource(new VectorF(0,-2,5), new VectorF(255,255,255), 80);
 
-        this.objects.add(new Sphere(0xFF00FFFF, new VectorF(0,0,-5f), 1));
-        this.objects.add(new Sphere(0xFFFF0000, new VectorF(2,-2,-7f), 1));
-        this.objects.add(new Sphere(0xFF0000FF, new VectorF(1.4f,2.6f,-8f), 2));
+        this.objects.add(new Sphere(new VectorF(0,255,0), new VectorF(0,0,-5f), 1));
+        this.objects.add(new Sphere(new VectorF(255,0,0), new VectorF(2,-2,-7f), 1));
+        this.objects.add(new Sphere(new VectorF(0,0,255), new VectorF(1.4f,2.6f,-8f), 2));
 
-        //do{
+        frame = new JFrame();
+        image = new MemoryImageSource(1280, 800, new DirectColorModel(24, 0xff0000, 0xff00, 0xff), new int[1280 * 800], 0, 1280);
+        imageLabel = new JLabel(new ImageIcon(Toolkit.getDefaultToolkit().createImage(image)));
+        frame.add(imageLabel);
+        frame.pack();
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setVisible(true);
+
+        do{
             update();
-//            wait(1000);
-//        }while (false);
+            render();
+            //wait(0);
+            //System.out.println("Refresh!");
+        }while (true);
     }
+
+    float offset = 0;
+    float delta = 0.3f;
 
     public void update(){
         int resX = cam_Image.imageWidth;
         int resY = cam_Image.imageHeight;
         int[] pixels = new int[resX * resY];
+
+        offset += delta;
+        if(offset > 10 || offset < -10){
+            delta *= -1;
+        }
+        light.pos.x = -offset;
+        light.pos.y = offset;
+
+//        Sphere moveing = (Sphere)objects.get(2);
+//        moveing.mid.y = offset;
 
         for (int y = 0; y < resY; ++y){
             for (int x = 0; x < resX; ++x) {
@@ -43,30 +72,25 @@ public class Raytracer {
                 float intersection = Float.POSITIVE_INFINITY;
                 for (int i = 0; i < objects.size(); i++) {
                     float tmp = objects.get(i).intersects(ray);
-                    if(Float.isFinite(tmp) && tmp < intersection){
+                    if(tmp < intersection){
                         intersection = tmp;
                         index = i;
                     }
                 }
                 if(index >= 0) {
-                    pixels[y * resX + x] = objects.get(index).color;
+                    VectorF lighting = light.diffuseLighting(ray.pointOnRay(intersection), objects.get(index));
+                    pixels[y * resX + x] = (0xFF << 24) | ((int)lighting.x << 16) | ((int)lighting.y << 8) | (int) lighting.z;
                 }else {
-                    pixels[y * resX + x] = 0xFF888888;
+                    pixels[y * resX + x] = 0xFF222222;
                 }
             }
         }
-        MemoryImageSource image = new MemoryImageSource(resX, resY, new DirectColorModel(24, 0xff0000, 0xff00, 0xff), pixels, 0, resX);
-        render(image);
+        image = new MemoryImageSource(resX, resY, new DirectColorModel(24, 0xff0000, 0xff00, 0xff), pixels, 0, resX);
     }
 
-    public void render(MemoryImageSource mis){
-        Image image = Toolkit.getDefaultToolkit().createImage(mis);
-
-        JFrame frame = new JFrame();
-        frame.add(new JLabel(new ImageIcon(image)));
-        frame.pack();
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setVisible(true);
+    public void render(){
+        Image i = Toolkit.getDefaultToolkit().createImage(image);
+        imageLabel.setIcon(new ImageIcon(i));
     }
 
     private void wait(int ms){

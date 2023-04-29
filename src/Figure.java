@@ -1,5 +1,7 @@
 public abstract class Figure {
-    int color;
+    VectorF color;
 
     abstract float intersects(Ray ray);
+
+    abstract VectorF getNormal(VectorF point);
 }
