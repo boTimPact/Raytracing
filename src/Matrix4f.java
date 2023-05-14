@@ -43,6 +43,14 @@ public class Matrix4f {
 		this.matrix[3] = new float[]{  0,	0,	 0,		 1};
 	}
 
+	public Matrix4f(float values[]){
+		for (int i = 0; i < 4; i++) {						//{  0, 1, 2, 3,
+			for (int j = 0; j < 4; j++) {					//	 4, 5, 6, 7,
+				this.matrix[i][j] = values[i * 4 + j];		//	 8, 9, 10,11,
+			}												//	 12,13,14,15}
+		}
+	}
+
 	public Matrix4f multiply(Matrix4f other) {
 		// TODO hier Matrizenmultiplikation "this = other * this" einfügen
 		float newMatrix[][] = new float[4][4];

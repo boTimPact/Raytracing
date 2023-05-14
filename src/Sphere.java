@@ -4,8 +4,8 @@ public class Sphere extends  Figure{
 
     public float radius;
 
-    public Sphere(VectorF color, VectorF mid, float radius){
-        super.color = color;
+    public Sphere(Material material, VectorF mid, float radius){
+        super.material = material;
         this.mid = mid;
         this.radius = radius;
     }
@@ -14,7 +14,7 @@ public class Sphere extends  Figure{
     public float intersects(Ray ray) {
         VectorF d = ray.direction;
         VectorF o = ray.origin;
-
+        //(x - cx)^2 + (y + cy)^2 + (z + cz)^2 = r^2
         // ax^2 + bx + c = 0
         float a = d.x * d.x + d.y * d.y + d.z * d.z;
         float b = 2 * (o.x * d.x - d.x * mid.x + o.y * d.y - d.y * mid.y + o.z * d.z - d.z * mid.z);

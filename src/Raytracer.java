@@ -17,19 +17,29 @@ public class Raytracer {
     public Camera_ImageLayer cam_Image;
     List<Figure> objects = new LinkedList<>();
     LightSource light;
-
     JFrame frame;
     JLabel imageLabel;
     MemoryImageSource image;
 
+    //TODO:
+    // Gammkorrektur (vor der Lichtberechnung in Lichtenergie umrechnen und danach wieder zurück),  ?maybe ready?
+    // Materialeigenschaften,(roughness, albedo, reflectivity, )
+    // Cock-Torrance (siehe Computergrafik),
+    // Quadik Körper,
+    // Constuctiv solid geometry,
+
+    // Übung 3:
+    // Schatten, (optional: mehrere Schatten, weiche Schatten),
+    // Lichtkegel,
+    // Reflexion (Strahl weiterleiten)
 
     public void init(){
-        cam_Image = new Camera_ImageLayer(1280, 800);
-        light = new LightSource(new VectorF(0,-2,5), new VectorF(255,255,255), 80);
+        cam_Image = new Camera_ImageLayer(1280+200, 800+150);
+        light = new LightSource(new VectorF(-10,2,5), new VectorF(255,255,255), 80, 2.2f);
 
-        this.objects.add(new Sphere(new VectorF(0,255,0), new VectorF(0,0,-5f), 1));
-        this.objects.add(new Sphere(new VectorF(255,0,0), new VectorF(2,-2,-7f), 1));
-        this.objects.add(new Sphere(new VectorF(0,0,255), new VectorF(1.4f,2.6f,-8f), 2));
+        this.objects.add(new Sphere(new Material(new VectorF(0,255,0), 0.8f,0), new VectorF(0,0,-5f), 1));
+        this.objects.add(new Sphere(new Material(new VectorF(255,0,0),0.8f,0), new VectorF(-3,-0,-7f), 1));
+        this.objects.add(new Sphere(new Material(new VectorF(0,0,255), 0.8f, 0), new VectorF(3f,1.5f,-8f), 2));
 
         frame = new JFrame();
         image = new MemoryImageSource(1280, 800, new DirectColorModel(24, 0xff0000, 0xff00, 0xff), new int[1280 * 800], 0, 1280);
@@ -43,12 +53,11 @@ public class Raytracer {
             update();
             render();
             //wait(0);
-            //System.out.println("Refresh!");
         }while (true);
     }
 
     float offset = 0;
-    float delta = 0.3f;
+    float delta = 0.15f;
 
     public void update(){
         int resX = cam_Image.imageWidth;

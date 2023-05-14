@@ -65,14 +65,22 @@ public class VectorF {
         return out;
     }
 
-//    public VectorF multiplyMatrix(Matrix4f matrix){
-//        VectorF out = new VectorF(this.x,this.y,this.z);
-//        out.x = matrix.matrix[0][0] * this.x + matrix.matrix[0][1] * this.y + matrix.matrix[0][2] * this.z + matrix.matrix[0][3] * w;
-//        out.y = matrix.matrix[1][0] * this.x + matrix.matrix[1][1] * this.y + matrix.matrix[1][2] * this.z + matrix.matrix[1][3] * w;
-//        out.z = matrix.matrix[2][0] * this.x + matrix.matrix[2][1] * this.y + matrix.matrix[2][2] * this.z + matrix.matrix[2][3] * w;
-//
-//        return out;
-//    }
+    public VectorF multiplyMatrix(Matrix4f matrix){
+        VectorF out = new VectorF(this.x,this.y,this.z);
+        out.x = matrix.matrix[0][0] * this.x + matrix.matrix[0][1] * this.y + matrix.matrix[0][2] * this.z + matrix.matrix[0][3] * w;
+        out.y = matrix.matrix[1][0] * this.x + matrix.matrix[1][1] * this.y + matrix.matrix[1][2] * this.z + matrix.matrix[1][3] * w;
+        out.z = matrix.matrix[2][0] * this.x + matrix.matrix[2][1] * this.y + matrix.matrix[2][2] * this.z + matrix.matrix[2][3] * w;
+
+        return out;
+    }
+
+    public VectorF multiplyLineByLine(VectorF other){
+        VectorF out = new VectorF(0,0,0);
+        out.x = this.x * other.x;
+        out.y = this.y * other.y;
+        out.z = this.z * other.z;
+        return out;
+    }
 
     //Kreuzprodukt
     public VectorF cross(VectorF other){
