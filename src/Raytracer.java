@@ -23,8 +23,6 @@ public class Raytracer {
 
     //TODO:
     // Gammkorrektur (vor der Lichtberechnung in Lichtenergie umrechnen und danach wieder zurück),  ?maybe ready?
-    // Materialeigenschaften,(roughness, albedo, reflectivity, )
-    // Cock-Torrance (siehe Computergrafik),
     // Quadik Körper,
     // Constuctiv solid geometry,
 
@@ -35,11 +33,11 @@ public class Raytracer {
 
     public void init(){
         cam_Image = new Camera_ImageLayer(1280+200, 800+150);
-        light = new LightSource(new VectorF(-10,2,5), new VectorF(255,255,255), 80, 2.2f);
+        light = new LightSource(new VectorF(-10,2,5), new VectorF(1,1,1), 1.0f, 2.2f);
 
-        this.objects.add(new Sphere(new Material(new VectorF(0,255,0), 0.8f,0), new VectorF(0,0,-5f), 1));
-        this.objects.add(new Sphere(new Material(new VectorF(255,0,0),0.8f,0), new VectorF(-3,-0,-7f), 1));
-        this.objects.add(new Sphere(new Material(new VectorF(0,0,255), 0.8f, 0), new VectorF(3f,1.5f,-8f), 2));
+        this.objects.add(new Sphere(new Material(new VectorF(0,1,0), 0.8f,0), new VectorF(0,0,-5f), 1));
+        this.objects.add(new Sphere(new Material(new VectorF(1,0,0),0.8f,0), new VectorF(-3,-0,-7f), 1));
+        this.objects.add(new Sphere(new Material(new VectorF(0,0,1), 0.8f, 0), new VectorF(3f,1.5f,-8f), 2));
 
         frame = new JFrame();
         image = new MemoryImageSource(1280, 800, new DirectColorModel(24, 0xff0000, 0xff00, 0xff), new int[1280 * 800], 0, 1280);
@@ -87,7 +85,7 @@ public class Raytracer {
                     }
                 }
                 if(index >= 0) {
-                    VectorF lighting = light.diffuseLighting(ray.pointOnRay(intersection), objects.get(index));
+                    VectorF lighting = light.physicallyBasedLighting(ray.pointOnRay(intersection), objects.get(index));
                     pixels[y * resX + x] = (0xFF << 24) | ((int)lighting.x << 16) | ((int)lighting.y << 8) | (int) lighting.z;
                 }else {
                     pixels[y * resX + x] = 0xFF222222;

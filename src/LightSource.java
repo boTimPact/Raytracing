@@ -13,26 +13,28 @@ public class LightSource {
         this.gamma = gamma;
     }
 
-    public VectorF diffuseLighting(VectorF point, Figure figure){
-        VectorF lightDirection = point.add(this.pos.negate());
+
+    // N = normalVector,
+    // V = Vector vom Schnittpunkt zur Kamera   -> here: point.negate()
+    // L = Vector von der Lichtquelle zum Schnittpunkt
+    // H = (V+L)/2 (normalisiert)
+    public VectorF physicallyBasedLighting(VectorF point, Figure figure){
+        VectorF lightDirection = point.add(this.pos.negate()).negate();
         VectorF normal = figure.getNormal(point);
 
         VectorF h = point.negate().normalize().add(lightDirection.normalize()).normalize();
 
-        VectorF f = fresnel(normal.dot(h), figure.material.metalness, figure.material.albedo);
-        float d = normalDistribution(normal, h, figure.material.roughness);
-        float g = geometry(normal.dot(point.negate()), normal.dot(lightDirection.normalize()), figure.material.roughness);
+        float f = fresnel(normal.dot(point.negate().normalize()), figure.material.metalness);
+        float d = normalDistribution(normal.dot(h), figure.material.roughness);
+        float g = geometry(normal.dot(point.negate().normalize()), normal.dot(lightDirection.normalize()), figure.material.roughness);
+        //System.out.println("Fresnel: " + f + "\tNormal: " + d + "\tGeometry: " + g);
 
-        VectorF ks = f.multiplyScalar(d * g);
-        VectorF kd = (new VectorF(1,1,1).add(ks.negate())).multiplyScalar(1 - figure.material.metalness);
+        float ks = f * d * g;
+        float kd = (1 - ks) * (1 - figure.material.metalness);
 
 
-
-//        float intensity = normal.dot(lightDirection.normalize().negate());
-//        VectorF light = figure.material.albedo.multiplyScalar(intensity * (brightness / (lightDirection.magnitude() * lightDirection.magnitude() + 1)));
-
-        //VectorF light = new VectorF(255,255,255).multiplyScalar(d);
-        VectorF light = (kd.multiplyLineByLine(figure.material.albedo).add(ks)).multiplyLineByLine(this.color.multiplyScalar(brightness * normal.dot(lightDirection.normalize())));
+        //VectorF light = new VectorF(255,255,255).multiplyScalar(f*g*d);
+        VectorF light = this.color.multiplyScalar(brightness * normal.dot(lightDirection.normalize())).multiplyLineByLine(figure.material.albedo.multiplyScalar(255).multiplyScalar(kd).add(new VectorF(ks,ks,ks)));
 
         light.x = Math.max(Math.min(light.x, 255), 0);
         light.y = Math.max(Math.min(light.y, 255), 0);
@@ -40,20 +42,15 @@ public class LightSource {
         return light;
     }
 
-    // N = normalVector,
-    // V = Vector vom Schnittpunkt zur Kamera   -> here: point.negate()
-    // L = Vector von der Lichtquelle zum Schnittpunkt
-    // H = (V+L)/2 (normalisiert)
-
-    float normalDistribution(VectorF n, VectorF w, float roughness){
-        return (float) ((roughness * roughness) / (Math.PI * Math.pow(n.dot(w) * n.dot(w) * (roughness * roughness - 1) + 1, 2)));
+    float normalDistribution(float nDotW, float roughness){
+        return (float) ((roughness * roughness) / (Math.PI * Math.pow(nDotW * nDotW * (roughness * roughness - 1) + 1, 2)));
     }
     float geometry(float ndotv, float ndotl, float roughness){
         return ndotv / (ndotv * (1 - roughness / 2) + roughness / 2) * ndotl / (ndotl * (1 - roughness / 2) + roughness / 2);
     }
-    VectorF fresnel(float hdotv, float metalness, VectorF albedo){
-        VectorF reflectivity = new VectorF(0.4f,0.4f,0.4f).multiplyScalar(1 - metalness).add(albedo.multiplyScalar(metalness));
-        return reflectivity.add(new VectorF(1,1,1).add(reflectivity.negate()).multiplyScalar((float) Math.pow(1- hdotv,5)));
+    float fresnel(float ndotv, float metalness){
+        float reflectivity = (float) (0.4 * (1 - metalness));
+        return reflectivity + (1 - reflectivity) * (1 - ndotv);
     }
 
 
