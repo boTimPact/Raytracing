@@ -36,6 +36,7 @@ public class Raytracer {
         light = new LightSource(new VectorF(-10,2,5), new VectorF(1,1,1), 1.0f, 2.2f);
 
         this.objects.add(new Sphere(new Material(new VectorF(0,1,0), 0.8f,0), new VectorF(0,0,-5f), 1));
+        //this.objects.add(new Quadrik(1,1,1,0,0,0,0,0,0,1, new Material(new VectorF(0,1,0), 0.8f,0)));
         this.objects.add(new Sphere(new Material(new VectorF(1,0,0),0.8f,0), new VectorF(-3,-0,-7f), 1));
         this.objects.add(new Sphere(new Material(new VectorF(0,0,1), 0.8f, 0), new VectorF(3f,1.5f,-8f), 2));
 
@@ -48,10 +49,10 @@ public class Raytracer {
         frame.setVisible(true);
 
         do{
-            long time = System.currentTimeMillis();
+            //long time = System.currentTimeMillis();
             update();
             render();
-            System.out.println(System.currentTimeMillis() - time + " milliseconds");
+            //System.out.println(System.currentTimeMillis() - time + " milliseconds");
             //wait(0);
         }while (true);
     }
