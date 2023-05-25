@@ -48,8 +48,10 @@ public class Raytracer {
         frame.setVisible(true);
 
         do{
+            long time = System.currentTimeMillis();
             update();
             render();
+            System.out.println(System.currentTimeMillis() - time + " milliseconds");
             //wait(0);
         }while (true);
     }
