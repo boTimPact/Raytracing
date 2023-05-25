@@ -11,7 +11,7 @@ public class Sphere extends  Figure{
     }
 
     @Override
-    public float intersects(Ray ray) {
+    public Float intersects(Ray ray) {
         VectorF d = ray.direction;
         VectorF o = ray.origin;
         //(x - cx)^2 + (y + cy)^2 + (z + cz)^2 = r^2

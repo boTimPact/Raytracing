@@ -33,13 +33,13 @@ public class LightSource {
         float kd = (1 - ks) * (1 - figure.material.metalness);
 
 
-        //VectorF light = new VectorF(255,255,255).multiplyScalar(f*g*d);
-        VectorF light = this.color.multiplyScalar(brightness * normal.dot(lightDirection.normalize())).multiplyLineByLine(figure.material.albedo.multiplyScalar(255).multiplyScalar(kd).add(new VectorF(ks,ks,ks)));
+        //VectorF light = new VectorF(1,1,1).multiplyScalar(d);
+        VectorF light = this.color.multiplyScalar(brightness * normal.dot(lightDirection.normalize())).multiplyLineByLine(figure.material.albedo.multiplyScalar(kd).add(new VectorF(ks,ks,ks)));
 
-        light.x = Math.max(Math.min(light.x, 255), 0);
-        light.y = Math.max(Math.min(light.y, 255), 0);
-        light.z = Math.max(Math.min(light.z, 255), 0);
-        return light;
+        light.x = Math.max(Math.min(light.x, 1), 0);
+        light.y = Math.max(Math.min(light.y, 1), 0);
+        light.z = Math.max(Math.min(light.z, 1), 0);
+        return light.multiplyScalar(255);
     }
 
     float normalDistribution(float nDotW, float roughness){
