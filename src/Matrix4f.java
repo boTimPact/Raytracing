@@ -79,68 +79,56 @@ public class Matrix4f {
 
 	public Matrix4f scale(float uniformFactor) {
 		// TODO gleichmäßige Skalierung um Faktor "uniformFactor" zu this hinzufügen
-		Matrix4f newMatrix = new Matrix4f();
-		newMatrix.matrix = new float[][]{{uniformFactor,0,0,0},{0,uniformFactor,0,0},{0,0,uniformFactor,0},{0,0,0,1}};
+		Matrix4f out = new Matrix4f();
+		out.matrix = new float[][]{{uniformFactor,0,0,0},{0,uniformFactor,0,0},{0,0,uniformFactor,0},{0,0,0,1}};
 
-		this.multiply(newMatrix);
-
-		return this;
+		return this.multiply(out);
 	}
 
 	public Matrix4f scale(float sx, float sy, float sz) {
 		// TODO ungleichförmige Skalierung zu this hinzufügen
-		Matrix4f newMatrix = new Matrix4f();
-		newMatrix.matrix = new float[][]{{sx,0,0,0},{0,sy,0,0},{0,0,sz,0},{0,0,0,1}};
+		Matrix4f out = new Matrix4f();
+		out.matrix = new float[][]{{sx,0,0,0},{0,sy,0,0},{0,0,sz,0},{0,0,0,1}};
 
-		this.multiply(newMatrix);
-
-		return this;
+		return this.multiply(out);
 	}
 
 	public Matrix4f rotateX(float angle) {
 		// TODO Rotation um X-Achse zu this hinzufügen
 		//angle = (float)Math.toRadians((double)angle);
-		Matrix4f newMatrix = new Matrix4f();
-		newMatrix.matrix = new float[][]{{1,0,0,0},{0,(float)Math.cos(angle),(float)-Math.sin(angle),0},{0,(float)Math.sin(angle),(float)Math.cos(angle),0},{0,0,0,1}};
+		Matrix4f out = new Matrix4f();
+		out.matrix = new float[][]{{1,0,0,0},{0,(float)Math.cos(angle),(float)-Math.sin(angle),0},{0,(float)Math.sin(angle),(float)Math.cos(angle),0},{0,0,0,1}};
 
-		this.multiply(newMatrix);
-
-		return this;
+		return this.multiply(out);
 	}
 
 	public Matrix4f rotateY(float angle) {
 		// TODO Rotation um Y-Achse zu this hinzufügen
-		Matrix4f newMatrix = new Matrix4f();
-		newMatrix.matrix = new float[][]{{(float)Math.cos(angle),0,(float)-Math.sin(angle),0},{0,1,0,0},{(float)Math.sin(angle),0,(float)Math.cos(angle),0},{0,0,0,1}};
+		Matrix4f out = new Matrix4f();
+		out.matrix = new float[][]{{(float)Math.cos(angle),0,(float)-Math.sin(angle),0},{0,1,0,0},{(float)Math.sin(angle),0,(float)Math.cos(angle),0},{0,0,0,1}};
 
-		this.multiply(newMatrix);
-
-		return this;
+		return this.multiply(out);
 	}
 
 	public Matrix4f rotateZ(float angle) {
 		// TODO Rotation um Z-Achse zu this hinzufügen
-		Matrix4f newMatrix = new Matrix4f();
-		newMatrix.matrix = new float[][]{{(float)Math.cos(angle),(float)-Math.sin(angle),0,0}, {(float)Math.sin(angle),(float)Math.cos(angle),0,0}, {0,0,1,0}, {0,0,0,1}};
+		Matrix4f out = new Matrix4f();
+		out.matrix = new float[][]{{(float)Math.cos(angle),(float)-Math.sin(angle),0,0}, {(float)Math.sin(angle),(float)Math.cos(angle),0,0}, {0,0,1,0}, {0,0,0,1}};
 
-		this.multiply(newMatrix);
-
-		return this;
+		return this.multiply(out);
 	}
 
 	public Matrix4f rotateVector(VectorF vec, float angle){
 		angle = (float)Math.toRadians(angle);
-		Matrix4f newMatrix = new Matrix4f();
-		newMatrix.matrix = new float[][]{
+		Matrix4f out = new Matrix4f();
+		out.matrix = new float[][]{
 				{(float) (Math.cos(angle) + vec.x*vec.x * (1 - Math.cos(angle))), (float) (vec.x * vec.y * (1 - Math.cos(angle)) - vec.z * Math.sin(angle)), (float) (vec.x * vec.z * (1 - Math.cos(angle)) + vec.y * Math.sin(angle)), 0},
 				{(float) (vec.x * vec.y * (1 - Math.cos(angle)) + vec.z * Math.sin(angle)), (float) (Math.cos(angle) + vec.y*vec.y * (1 - Math.cos(angle))), (float) (vec.y * vec.z * (1 - Math.cos(angle)) - vec.x * Math.sin(angle)), 0},
 				{(float) (vec.z * vec.x * (1 - Math.cos(angle)) - vec.y * Math.sin(angle)), (float) (vec.y * vec.z * (1 - Math.cos(angle)) + vec.x * Math.sin(angle)), (float) (Math.cos(angle) + vec.z*vec.z * (1 - Math.cos(angle))), 0},
 				{0,0,0,1}
 		};
 
-		this.multiply(newMatrix);
-
-		return this;
+		return this.multiply(out);
 	}
 
 	public Matrix4f transpose(){

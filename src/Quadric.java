@@ -73,6 +73,31 @@ public class Quadric extends Figure{
         return new Quadric(out, this.material);
     }
 
+    public Quadric scale(VectorF vec){
+        Matrix4f out;
+
+        vec.x = 1 / vec.x;
+        vec.y = 1 / vec.y;
+        vec.z = 1 / vec.z;
+
+        Matrix4f matrixQuadric = new Matrix4f(new float[]{a,d,e,g,d,b,f,h,e,f,c,i,g,h,i,j});
+        Matrix4f scaleMatrix = new Matrix4f().scale(vec.x, vec.y, vec.z);
+        Matrix4f scaleTranposeMatrix = new Matrix4f().scale(vec.x, vec.y, vec.z).transpose();
+
+        out = scaleTranposeMatrix.multiply(matrixQuadric).multiply(scaleMatrix);
+        return new Quadric(out, this.material);
+    }
+
+    public Quadric rotate(VectorF rotationVec, float angle){
+        Matrix4f out;
+        Matrix4f matrixQuadric = new Matrix4f(new float[]{a,d,e,g,d,b,f,h,e,f,c,i,g,h,i,j});
+        Matrix4f rotateMatrix = new Matrix4f().rotateVector(rotationVec, -angle);
+        Matrix4f rotateTranposeMatrix = new Matrix4f().rotateVector(rotationVec, -angle).transpose();
+
+        out = rotateTranposeMatrix.multiply(matrixQuadric).multiply(rotateMatrix);
+        return new Quadric(out, this.material);
+    }
+
     @Override
     VectorF getNormal(VectorF point) {
         return new VectorF(this.a * point.x + this.d * point.y + this.e * point.z + this.g, this.b * point.y + this.d * point.x + this.f * point.z + this.h, this.c * point.z + this.e * point.x + this.f * point.y + this.i).normalize();

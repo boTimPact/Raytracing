@@ -2,6 +2,7 @@
 
 import java.awt.Image;
 import java.awt.Toolkit;
+import java.awt.geom.Point2D;
 import java.awt.image.DirectColorModel;
 import java.awt.image.MemoryImageSource;
 import java.util.LinkedList;
@@ -36,9 +37,10 @@ public class Raytracer {
         light = new LightSource(new VectorF(0,0,10), new VectorF(1,1,1), 1.0f, 2.2f);
 
         //this.objects.add(new Sphere(new Material(new VectorF(0,1,0), 0.5f,0), new VectorF(0,0,-4), 1));
-        this.objects.add(new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0,1,0), 0.5f,0)).translate(new VectorF(0,0,-10)));
-        this.objects.add(new Sphere(new Material(new VectorF(1,0,0),0.8f,0), new VectorF(-3,-0,-15f), 1));
-        this.objects.add(new Sphere(new Material(new VectorF(0,0,1), 0.8f, 0), new VectorF(2.5f,1.5f,-16f), 2));
+        this.objects.add(new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0,1,0), 0.5f,0)).scale(new VectorF(2,2,2)).translate(new VectorF(0,0,-8)));
+        //this.objects.add(new Quadric(0,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0,1,0), 0.5f,0)).rotate(new VectorF(0,0,1), 60)/*.scale(new VectorF(2,2,2))*/.translate(new VectorF(0,0,-8)));
+        this.objects.add(new Sphere(new Material(new VectorF(1,0,0),0.8f,0), new VectorF(-3,-0,-8f), 1));
+        this.objects.add(new Sphere(new Material(new VectorF(0,0,1), 0.8f, 0), new VectorF(3f,1.5f,-11f), 2));
 
         frame = new JFrame();
         image = new MemoryImageSource(1280, 800, new DirectColorModel(24, 0xff0000, 0xff00, 0xff), new int[1280 * 800], 0, 1280);
