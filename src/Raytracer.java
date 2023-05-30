@@ -36,9 +36,9 @@ public class Raytracer {
         light = new LightSource(new VectorF(0,0,10), new VectorF(1,1,1), 1.0f, 2.2f);
 
         //this.objects.add(new Sphere(new Material(new VectorF(0,1,0), 0.5f,0), new VectorF(0,0,-4), 1));
-        this.objects.add(new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0,1,0), 0.5f,0)).translate(new VectorF(0,0,2)));
-        this.objects.add(new Sphere(new Material(new VectorF(1,0,0),0.8f,0), new VectorF(-3,-0,-7f), 1));
-        this.objects.add(new Sphere(new Material(new VectorF(0,0,1), 0.8f, 0), new VectorF(2.5f,1.5f,-6f), 2));
+        this.objects.add(new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0,1,0), 0.5f,0)).translate(new VectorF(0,0,-10)));
+        this.objects.add(new Sphere(new Material(new VectorF(1,0,0),0.8f,0), new VectorF(-3,-0,-15f), 1));
+        this.objects.add(new Sphere(new Material(new VectorF(0,0,1), 0.8f, 0), new VectorF(2.5f,1.5f,-16f), 2));
 
         frame = new JFrame();
         image = new MemoryImageSource(1280, 800, new DirectColorModel(24, 0xff0000, 0xff00, 0xff), new int[1280 * 800], 0, 1280);
