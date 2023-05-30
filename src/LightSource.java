@@ -24,6 +24,8 @@ public class LightSource {
 
         VectorF h = point.negate().normalize().add(lightDirection.normalize()).normalize();
 
+        if(normal.dot(lightDirection) < 0) return new VectorF(0,0,0);
+
         float f = fresnel(normal.dot(point.negate().normalize()), figure.material.metalness);
         float d = normalDistribution(normal.dot(h), figure.material.roughness);
         float g = geometry(normal.dot(point.negate().normalize()), normal.dot(lightDirection.normalize()), figure.material.roughness);
@@ -33,7 +35,7 @@ public class LightSource {
         float kd = (1 - ks) * (1 - figure.material.metalness);
 
 
-        //VectorF light = new VectorF(1,1,1).multiplyScalar(d);
+        //VectorF light = new VectorF(1,1,1).multiplyScalar(f);
         VectorF light = this.color.multiplyScalar(brightness * normal.dot(lightDirection.normalize())).multiplyLineByLine(figure.material.albedo.multiplyScalar(kd).add(new VectorF(ks,ks,ks)));
 
         light.x = Math.max(Math.min(light.x, 1), 0);

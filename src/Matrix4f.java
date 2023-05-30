@@ -1,3 +1,5 @@
+import java.util.Arrays;
+
 //Alle Operationen ändern das Matrixobjekt selbst und geben das eigene Matrixobjekt zurück
 //Dadurch kann man Aufrufe verketten, z.B.
 //Matrix4 m = new Matrix4().scale(5).translate(0,1,0).rotateX(0.5f);
@@ -53,30 +55,26 @@ public class Matrix4f {
 
 	public Matrix4f multiply(Matrix4f other) {
 		// TODO hier Matrizenmultiplikation "this = other * this" einfügen
-		float newMatrix[][] = new float[4][4];
+		Matrix4f out = new Matrix4f();
 
 		for (int i = 0; i < 4; i++) {
 			for (int j = 0; j < 4; j++) {
 				float sum = 0;
 				for (int k = 0; k < 4; k++) {
-					sum += other.matrix[i][k] * this.matrix[k][j];
+					sum += this.matrix[i][k] * other.matrix[k][j];
 				}
-				newMatrix[i][j] = sum;
+				out.matrix[i][j] = sum;
 			}
 		}
-
-		this.matrix = newMatrix;
-		return this;
+		return out;
 	}
 
 	public Matrix4f translate(float x, float y, float z) {
 		// TODO Verschiebung um x,y,z zu this hinzufügen
-		Matrix4f newMatrix = new Matrix4f();
-		newMatrix.matrix = new float[][]{{1,0,0,x},{0,1,0,y},{0,0,1,z},{0,0,0,1}};
+		Matrix4f out = new Matrix4f();
+		out.matrix = new float[][]{{1,0,0,x},{0,1,0,y},{0,0,1,z},{0,0,0,1}};
 
-		this.multiply(newMatrix);
-
-		return this;
+		return this.multiply(out);
 	}
 
 	public Matrix4f scale(float uniformFactor) {
@@ -145,6 +143,16 @@ public class Matrix4f {
 		return this;
 	}
 
+	public Matrix4f transpose(){
+		Matrix4f out = new Matrix4f();
+		for (int i = 0; i < matrix.length; i++) {
+			for (int j = 0; j < matrix[0].length; j++) {
+				out.matrix[i][j] = this.matrix[j][i];
+			}
+		}
+		return out;
+	}
+
 	public float[] getValuesAsArray() {
 		// TODO hier Werte in einem Float-Array mit 16 Elementen (spaltenweise gefüllt) herausgeben
 		float arr[] = new float[16];
@@ -157,10 +165,15 @@ public class Matrix4f {
 		return arr;
 	}
 
-	/*
-	public static void main(String[] args) {
-		Matrix4f test = new Matrix4f(1);
-		System.out.println("test");
+	@Override
+	public String toString() {
+		String out = "";
+		for (int i = 0; i < matrix.length; i++) {
+			for (int j = 0; j < matrix[0].length; j++) {
+				out += matrix[i][j] + " ";
+			}
+			out += "\n";
+		}
+		return out;
 	}
-	*/
 }

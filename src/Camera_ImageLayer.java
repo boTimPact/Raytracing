@@ -14,7 +14,7 @@ public class Camera_ImageLayer {
 
 
     public Camera_ImageLayer(int imageWidth, int imageHeight){
-        this.pos = new VectorF(0,0,3,1);
+        this.pos = new VectorF(0,0,0,1);
         this.cameraUp = new VectorF(0,1,0);
         this.cameraRight = new VectorF(1,0,0);
         this.cameraViewDirection = new VectorF(0,0,-1);
