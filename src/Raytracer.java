@@ -11,7 +11,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
-
 public class Raytracer {
 
     public Camera_ImageLayer cam_Image;
@@ -21,7 +20,11 @@ public class Raytracer {
     JLabel imageLabel;
     MemoryImageSource image;
 
+    private static final int width = 1920;
+    private static final int height = 1080;
+
     //TODO:
+
     // Gammkorrektur (vor der Lichtberechnung in Lichtenergie umrechnen und danach wieder zurück),  ?maybe ready?
     // Quadik Körper,
     // Constuctiv solid geometry,
@@ -30,15 +33,14 @@ public class Raytracer {
     // Schatten, (optional: mehrere Schatten, weiche Schatten),
     // Lichtkegel,
     // Reflexion (Strahl weiterleiten)
-    Quadric test = new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(1,1,1), 0.6f,0)).scale(new VectorF(1.2f,1.2f,1.2f)).translate(new VectorF(0f,3.5f,0f));
+    Quadric test = new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(1,1,0), 0.6f,0)).scale(new VectorF(1.2f,1.2f,1.2f)).translate(new VectorF(-0.7f,2.3f,0f));
 
     public void init(){
-        cam_Image = new Camera_ImageLayer(1280+200, 800+150);
+        cam_Image = new Camera_ImageLayer(width, height);
         light = new LightSource(new VectorF(0,0,5), new VectorF(1,1,1), 1.0f, 2.2f);
 
-        //this.objects.add(new Sphere(new Material(new VectorF(0,1,0), 0.5f,0), new VectorF(0,0,-4), 1));
+
         this.objects.add(new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0.6f,0,1), 0.15f,0)).scale(new VectorF(2,2,2)).translate(new VectorF(5,0,-10)));
-        this.objects.add(new Quadric(0,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0,0,1), 0.2f,0)).rotate(new VectorF(0,0,1), -75).translate(new VectorF(-5,0,-10)));
         objects.add(new CSG.Union(
                 new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(1,0,0), 0.3f,0)).scale(new VectorF(1.5f, 1.5f, 1.5f)).translate(new VectorF(-0.4f,-3,-0.5f)),
                 new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0,0,1), 0.7f,0)).translate(new VectorF(0.35f,0-3,0f)))
@@ -54,12 +56,20 @@ public class Raytracer {
             new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0.5f,1,0.5f), 0.8f,0)).scale(new VectorF(1.5f,1.5f,1.5f)).translate(new VectorF(-1,2.5f,-0.5f)),
             test)
         );
-        //this.objects.add(new Sphere(new Material(new VectorF(1,0,0),0.8f,0), new VectorF(-3,-0,-8f), 1));
-        //this.objects.add(new Sphere(new Material(new VectorF(0,0,1), 0.8f, 0), new VectorF(3f,1.5f,-11f), 2));
+
+        objects.add(new Quadric(0,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0,0,1), 0.2f,0)).rotate(new VectorF(0,0,1), -75).rotate(new VectorF(1,0,0), 60).translate(new VectorF(-5,0,-10)));
+//        objects.add(new CSG.Intersection(
+//                new Quadric(0,0,0,0,0,0,0,-1,0,-8, new Material(new VectorF(1,0,0),1,0)).rotate(new VectorF(1,0,0), 20),
+//                new Quadric(0,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0,0,1), 0.2f,0)).rotate(new VectorF(0,0,1), -75).rotate(new VectorF(1,0,0), 20).translate(new VectorF(-5,0,-10))
+//        ));
+
+//        this.objects.add(new Sphere(new Material(new VectorF(0,1,0), 0.15f,0), new VectorF(0,0,-2), 2f));
+//        this.objects.add(new Sphere(new Material(new VectorF(1,0,0),0.3f,0), new VectorF(-3,-0,-4f), 1));
+//        this.objects.add(new Sphere(new Material(new VectorF(0,0,1), 0.6f, 0), new VectorF(3f,1.5f,-6.5f), 2));
 
 
         frame = new JFrame();
-        image = new MemoryImageSource(1280, 800, new DirectColorModel(24, 0xff0000, 0xff00, 0xff), new int[1280 * 800], 0, 1280);
+        image = new MemoryImageSource(width, height, new DirectColorModel(24, 0xff0000, 0xff00, 0xff), new int[width * height], 0, width);
         imageLabel = new JLabel(new ImageIcon(Toolkit.getDefaultToolkit().createImage(image)));
         frame.add(imageLabel);
         frame.pack();
@@ -72,11 +82,11 @@ public class Raytracer {
             render();
             System.out.println(System.currentTimeMillis() - time + " milliseconds");
             //wait(0);
-        }while (false);
+        }while (true);
     }
 
     float offset = 0;
-    float delta = 0.2f;
+    float delta = 0.4f;
 
     public void update(){
         int resX = cam_Image.imageWidth;
@@ -111,7 +121,7 @@ public class Raytracer {
                     }
                 }
                 if(intersectionPoint != null) {
-                    VectorF lighting = light.physicallyBasedLighting(ray.pointOnRay(intersectionPoint.intersection), objects.get(index), ray.origin);
+                    VectorF lighting = light.physicallyBasedLighting(ray.pointOnRay(intersectionPoint.intersection), objects.get(index), intersectionPoint.figure, ray.origin);
                     pixels[y * resX + x] = (0xFF << 24) | ((int)lighting.x << 16) | ((int)lighting.y << 8) | (int) lighting.z;
                 }else {
                     pixels[y * resX + x] = 0xFF222222;

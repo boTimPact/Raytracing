@@ -41,7 +41,7 @@ public class Sphere extends  Figure{
         return out;
     }
 
-    public VectorF getNormal(VectorF point, Figure figure){
+    public VectorF getNormal(VectorF point, Figure figure, Figure intersectionFigure){
         return point.add(this.mid.negate()).normalize();
     }
 }

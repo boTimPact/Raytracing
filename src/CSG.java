@@ -40,16 +40,20 @@ abstract class CSG extends Figure{
         }
 
         @Override
-        VectorF getNormal(VectorF point, Figure figure) {
+        VectorF getNormal(VectorF point, Figure figure, Figure intersectionFigure) {
             Queue<Figure> queue = new LinkedList<>();
             queue.add(figure);
 
             while (!queue.isEmpty()){
                 Figure current = queue.remove();
-                if(this.a.equals(figure)) return a.getNormal(point,figure);
-                if(this.b.equals(figure)) return b.getNormal(point, figure);
-                queue.add(a);
-                queue.add(b);
+                if(a instanceof Quadric) {
+                    if(a.equals(intersectionFigure)) return a.getNormal(point,figure, intersectionFigure);
+                }
+                if(a instanceof Quadric) {
+                    if(b.equals(intersectionFigure)) return b.getNormal(point, figure, intersectionFigure);
+                }
+                if(a.getClass() != Quadric.class) queue.add(a);
+                if(b.getClass() != Quadric.class) queue.add(b);
             }
             return null;
         }
@@ -73,6 +77,8 @@ abstract class CSG extends Figure{
             intersectionPoints.addAll(intersectionPointsA);
             intersectionPoints.addAll(intersectionPointsB);
 
+
+            //TODO: fix for planes
             intersectionPoints.sort(new Comparator<IntersectionPoint>() {
                 @Override
                 public int compare(IntersectionPoint o1, IntersectionPoint o2) {
@@ -86,16 +92,20 @@ abstract class CSG extends Figure{
         }
 
         @Override
-        VectorF getNormal(VectorF point, Figure figure) {
+        VectorF getNormal(VectorF point, Figure figure, Figure intersectionFigure) {
             Queue<Figure> queue = new LinkedList<>();
             queue.add(figure);
 
             while (!queue.isEmpty()){
                 Figure current = queue.remove();
-                if(this.a.equals(figure)) return a.getNormal(point,figure);
-                if(this.b.equals(figure)) return b.getNormal(point, figure);
-                queue.add(a);
-                queue.add(b);
+                if(a instanceof Quadric) {
+                    if(a.equals(intersectionFigure)) return a.getNormal(point,figure, intersectionFigure);
+                }
+                if(a instanceof Quadric) {
+                    if(b.equals(intersectionFigure)) return b.getNormal(point, figure, intersectionFigure);
+                }
+                if(a.getClass() != Quadric.class) queue.add(a);
+                if(b.getClass() != Quadric.class) queue.add(b);
             }
             return null;
         }
@@ -150,16 +160,20 @@ abstract class CSG extends Figure{
         }
 
         @Override
-        VectorF getNormal(VectorF point, Figure figure) {
+        VectorF getNormal(VectorF point, Figure figure, Figure intersectionFigure) {
             Queue<Figure> queue = new LinkedList<>();
             queue.add(figure);
 
             while (!queue.isEmpty()){
                 Figure current = queue.remove();
-                if(this.a.equals(figure)) return a.getNormal(point,figure);
-                if(this.b.equals(figure)) return b.getNormal(point, figure).negate();
-                queue.add(a);
-                queue.add(b);
+                if(a instanceof Quadric) {
+                    if(a.equals(intersectionFigure)) return a.getNormal(point,figure, intersectionFigure);
+                }
+                if(a instanceof Quadric) {
+                    if(b.equals(intersectionFigure)) return b.getNormal(point, figure, intersectionFigure).negate();
+                }
+                if(a.getClass() != Quadric.class) queue.add(a);
+                if(b.getClass() != Quadric.class) queue.add(b);
             }
             return null;
         }

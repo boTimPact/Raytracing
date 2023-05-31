@@ -1,5 +1,6 @@
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 public class Quadric extends Figure{
 
@@ -108,7 +109,20 @@ public class Quadric extends Figure{
     }
 
 
-    VectorF getNormal(VectorF point, Figure figure) {
+    VectorF getNormal(VectorF point, Figure figure, Figure intersectionFigure) {
         return new VectorF(this.a * point.x + this.d * point.y + this.e * point.z + this.g, this.b * point.y + this.d * point.x + this.f * point.z + this.h, this.c * point.z + this.e * point.x + this.f * point.y + this.i).normalize();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Quadric quadric = (Quadric) o;
+        return Float.compare(quadric.a, a) == 0 && Float.compare(quadric.b, b) == 0 && Float.compare(quadric.c, c) == 0 && Float.compare(quadric.d, d) == 0 && Float.compare(quadric.e, e) == 0 && Float.compare(quadric.f, f) == 0 && Float.compare(quadric.g, g) == 0 && Float.compare(quadric.h, h) == 0 && Float.compare(quadric.i, i) == 0 && Float.compare(quadric.j, j) == 0;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(a, b, c, d, e, f, g, h, i, j);
     }
 }

@@ -18,33 +18,33 @@ public class LightSource {
     // V = Vector vom Schnittpunkt zur Kamera   -> here: point.negate()
     // L = Vector von der Lichtquelle zum Schnittpunkt
     // H = (V+L)/2 (normalisiert)
-    public VectorF physicallyBasedLighting(VectorF point, Figure figure, VectorF camera){
+    public VectorF physicallyBasedLighting(VectorF point, Figure figure, Figure intersectionFigure, VectorF camera){
 
 
         VectorF lightDirection = point.add(this.pos.negate()).negate().normalize();
-        VectorF normal = figure.getNormal(point, figure);
+        VectorF normal = figure.getNormal(point, figure, intersectionFigure);
         VectorF view = camera.add(point.negate()).normalize();
 
         VectorF h = view.normalize().add(lightDirection.normalize()).normalize();
 
         if(normal.dot(lightDirection) < 0) return new VectorF(0,0,0);
 
-        float f = fresnel(normal.dot(view.normalize()), figure.material.metalness);
-        float d = normalDistribution(normal.dot(h), figure.material.roughness);
-        float g = geometry(normal.dot(view.normalize()), normal.dot(lightDirection.normalize()), figure.material.roughness);
+        float f = fresnel(normal.dot(view.normalize()), intersectionFigure.material.metalness);
+        float d = normalDistribution(normal.dot(h), intersectionFigure.material.roughness);
+        float g = geometry(normal.dot(view.normalize()), normal.dot(lightDirection.normalize()), intersectionFigure.material.roughness);
         //System.out.println("Fresnel: " + f + "\tNormal: " + d + "\tGeometry: " + g);
 
         float ks = f * d * g;
-        float kd = (1 - ks) * (1 - figure.material.metalness);
+        float kd = (1 - ks) * (1 - intersectionFigure.material.metalness);
 
         this.color = gammaCorrectionDown(this.color, gamma);
-        figure.material.albedo = gammaCorrectionDown(figure.material.albedo, gamma);
+        intersectionFigure.material.albedo = gammaCorrectionDown(intersectionFigure.material.albedo, gamma);
 
         //VectorF light = new VectorF(1,1,1).multiplyScalar(f*d*g);
-        VectorF light = this.color.multiplyScalar(brightness * normal.dot(lightDirection.normalize())).multiplyLineByLine(figure.material.albedo.multiplyScalar(kd).add(new VectorF(ks,ks,ks)));
+        VectorF light = this.color.multiplyScalar(brightness * normal.dot(lightDirection.normalize())).multiplyLineByLine(intersectionFigure.material.albedo.multiplyScalar(kd).add(new VectorF(ks,ks,ks)));
 
         this.color = gammaCorrectionUp(this.color, gamma);
-        figure.material.albedo = gammaCorrectionUp(figure.material.albedo, gamma);
+        intersectionFigure.material.albedo = gammaCorrectionUp(intersectionFigure.material.albedo, gamma);
 
         light.x = Math.max(Math.min(light.x, 1), 0);
         light.y = Math.max(Math.min(light.y, 1), 0);
