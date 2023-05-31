@@ -30,25 +30,30 @@ public class Raytracer {
     // Schatten, (optional: mehrere Schatten, weiche Schatten),
     // Lichtkegel,
     // Reflexion (Strahl weiterleiten)
+    Quadric test = new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(1,1,1), 0.6f,0)).scale(new VectorF(1.2f,1.2f,1.2f)).translate(new VectorF(0f,0.5f,0f));
 
     public void init(){
         cam_Image = new Camera_ImageLayer(1280+200, 800+150);
         light = new LightSource(new VectorF(0,0,5), new VectorF(1,1,1), 1.0f, 2.2f);
 
         //this.objects.add(new Sphere(new Material(new VectorF(0,1,0), 0.5f,0), new VectorF(0,0,-4), 1));
-        this.objects.add(new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0.6f,0,1), 0.1f,0)).scale(new VectorF(2,2,2)).translate(new VectorF(5,0,-10)));
-        this.objects.add(new Quadric(0,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0,0,1), 0.2f,0)).rotate(new VectorF(0,0,1), -75).translate(new VectorF(-5,0,-10)));
-        objects.add(new CSG.Union(
-                new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0,1,0), 0.3f,0)).translate(new VectorF(-0.25f,-3,0)),
-                new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(1,0,0), 0.7f,0)).translate(new VectorF(0.25f,0-3,0f))));
+//        this.objects.add(new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0.6f,0,1), 0.15f,0)).scale(new VectorF(2,2,2)).translate(new VectorF(5,0,-10)));
+//        this.objects.add(new Quadric(0,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0,0,1), 0.2f,0)).rotate(new VectorF(0,0,1), -75).translate(new VectorF(-5,0,-10)));
+//        objects.add(new CSG.Union(
+//                new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(1,0,0), 0.3f,0)).scale(new VectorF(1.5f, 1.5f, 1.5f)).translate(new VectorF(-0.4f,-3,-0.5f)),
+//                new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0,0,1), 0.7f,0)).translate(new VectorF(0.35f,0-3,0f)))
+//        );
+//
+//        objects.add(new CSG.Intersection(
+//                new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(1,1,0), 0.2f,0)).translate(new VectorF(-0.35f,0,-0.3f)),
+//                new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0,1,1), 0.5f,0)).translate(new VectorF(0.35f,0,0f)))
+//        );
 
-        objects.add(new CSG.Intersection(
-                new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(1,1,0), 0.2f,0)).translate(new VectorF(-0.25f,0,0)),
-                new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0,1,1), 0.5f,0)).translate(new VectorF(0.25f,0,0f))));
 
         objects.add(new CSG.Differenz(
-                new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0.5f,1,0.5f), 0.8f,0)).translate(new VectorF(-0.25f,3,0)),
-                new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(1,1,1), 0.6f,0)).translate(new VectorF(0.25f,3,0f))));
+            new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0.5f,1,0.5f), 0.8f,0)).scale(new VectorF(1.5f,1.5f,1.5f)).translate(new VectorF(0,0,-0.5f)),
+            test)
+        );
         //this.objects.add(new Sphere(new Material(new VectorF(1,0,0),0.8f,0), new VectorF(-3,-0,-8f), 1));
         //this.objects.add(new Sphere(new Material(new VectorF(0,0,1), 0.8f, 0), new VectorF(3f,1.5f,-11f), 2));
 
@@ -67,7 +72,7 @@ public class Raytracer {
             render();
             System.out.println(System.currentTimeMillis() - time + " milliseconds");
             //wait(0);
-        }while (true);
+        }while (false);
     }
 
     float offset = 0;
