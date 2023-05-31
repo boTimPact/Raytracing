@@ -14,7 +14,7 @@ public class Camera_ImageLayer {
 
 
     public Camera_ImageLayer(int imageWidth, int imageHeight){
-        this.pos = new VectorF(0,0, 100/*0*/,1);
+        this.pos = new VectorF(0,0, 100/*100*/,1);
         this.cameraUp = new VectorF(0,1,0);
         this.cameraRight = new VectorF(1,0,0);
         this.cameraViewDirection = new VectorF(0,0,-1);
@@ -22,7 +22,7 @@ public class Camera_ImageLayer {
 
         this.imageWidth = imageWidth;
         this.imageHeight = imageHeight;
-        this.aspectRatioX = imageWidth / (float)imageHeight / 10/*  */;
+        this.aspectRatioX = imageWidth / (float)imageHeight / 10 /* */;
         this.aspectRatioY = (imageHeight * aspectRatioX) / imageWidth;
 
 

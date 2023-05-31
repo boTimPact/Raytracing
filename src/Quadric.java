@@ -1,3 +1,6 @@
+import java.util.LinkedList;
+import java.util.List;
+
 public class Quadric extends Figure{
 
     float a;
@@ -43,7 +46,9 @@ public class Quadric extends Figure{
     //ax2 +by2 +cz2 +2(dxy+exz+fyz+gx+hy+iz)+j<0
     //x= ((o1) + p * (r1)), y= ((o2) + p * (r2)), z= ((o3) + p * (r3))
     @Override
-    public Float intersects(Ray ray) {
+    public List<IntersectionPoint> intersects(Ray ray) {
+        List<IntersectionPoint> out = new LinkedList<>();
+
         VectorF d = ray.direction;
         VectorF o = ray.origin;
 
@@ -53,14 +58,18 @@ public class Quadric extends Figure{
 
         float discriminant = b * b - 4 * a * c;
 
-        if(discriminant < 0) return null;
+        if(discriminant < 0) return out;
 
-        if(a == 0){
-            return -c/b;
+        if(a == 0) {
+            out.add(new IntersectionPoint(-c/b, this));
+            return out;
         }
+
         //(-b - [Vorzeichen von b] * √(b2 - 4ac))/2
         float k = (float) (-b - Math.signum(b) * Math.sqrt(discriminant)) / 2;
-        return Math.min(c/k, k/a);
+        out.add(new IntersectionPoint(Math.min(c/k, k/a), this));
+        out.add(new IntersectionPoint(Math.max(c/k, k/a), this));
+        return out;
     }
 
     public Quadric translate(VectorF vec){
@@ -98,8 +107,8 @@ public class Quadric extends Figure{
         return new Quadric(out, this.material);
     }
 
-    @Override
-    VectorF getNormal(VectorF point) {
+
+    VectorF getNormal(VectorF point, Figure figure) {
         return new VectorF(this.a * point.x + this.d * point.y + this.e * point.z + this.g, this.b * point.y + this.d * point.x + this.f * point.z + this.h, this.c * point.z + this.e * point.x + this.f * point.y + this.i).normalize();
     }
 }

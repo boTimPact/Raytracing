@@ -1,3 +1,6 @@
+import java.util.LinkedList;
+import java.util.List;
+
 public class Sphere extends  Figure{
 
     public VectorF mid;
@@ -11,7 +14,9 @@ public class Sphere extends  Figure{
     }
 
     @Override
-    public Float intersects(Ray ray) {
+    public List<IntersectionPoint> intersects(Ray ray) {
+        List<IntersectionPoint> out = new LinkedList<>();
+
         VectorF d = ray.direction;
         VectorF o = ray.origin;
         //(x - cx)^2 + (y + cy)^2 + (z + cz)^2 = r^2
@@ -22,16 +27,21 @@ public class Sphere extends  Figure{
 
         float discriminant = b * b - 4 * a * c;
 
-        if(a == 0){
-            return -c/b;
+        if(discriminant < 0) return out;
+
+        if(a == 0) {
+            out.add(new IntersectionPoint(-c/b, this));
+            return out;
         }
-        //(-b – [Vorzeichen von b] * √(b2 – 4ac))/2
-        float k = (float) (-b - Math.signum(b) * Math.sqrt(b * b - 4 * a * c)) / 2;
-        return Math.min(c/k, k/a);
+
+        //(-b - [Vorzeichen von b] * √(b2 - 4ac))/2
+        float k = (float) (-b - Math.signum(b) * Math.sqrt(discriminant)) / 2;
+        out.add(new IntersectionPoint(Math.min(c/k, k/a), this));
+        out.add(new IntersectionPoint(Math.max(c/k, k/a), this));
+        return out;
     }
 
-    @Override
-    public VectorF getNormal(VectorF point){
+    public VectorF getNormal(VectorF point, Figure figure){
         return point.add(this.mid.negate()).normalize();
     }
 }

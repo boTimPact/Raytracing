@@ -2,7 +2,6 @@
 
 import java.awt.Image;
 import java.awt.Toolkit;
-import java.awt.geom.Point2D;
 import java.awt.image.DirectColorModel;
 import java.awt.image.MemoryImageSource;
 import java.util.LinkedList;
@@ -34,13 +33,25 @@ public class Raytracer {
 
     public void init(){
         cam_Image = new Camera_ImageLayer(1280+200, 800+150);
-        light = new LightSource(new VectorF(0,0,10), new VectorF(1,1,1), 1.0f, 2.2f);
+        light = new LightSource(new VectorF(0,0,5), new VectorF(1,1,1), 1.0f, 2.2f);
 
         //this.objects.add(new Sphere(new Material(new VectorF(0,1,0), 0.5f,0), new VectorF(0,0,-4), 1));
-        this.objects.add(new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0,1,0), 0.5f,0)).scale(new VectorF(2,2,2)).translate(new VectorF(0,0,-8)));
-        //this.objects.add(new Quadric(0,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0,1,0), 0.5f,0)).rotate(new VectorF(0,0,1), 60)/*.scale(new VectorF(2,2,2))*/.translate(new VectorF(0,0,-8)));
-        this.objects.add(new Sphere(new Material(new VectorF(1,0,0),0.8f,0), new VectorF(-3,-0,-8f), 1));
-        this.objects.add(new Sphere(new Material(new VectorF(0,0,1), 0.8f, 0), new VectorF(3f,1.5f,-11f), 2));
+        this.objects.add(new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0.6f,0,1), 0.1f,0)).scale(new VectorF(2,2,2)).translate(new VectorF(5,0,-10)));
+        this.objects.add(new Quadric(0,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0,0,1), 0.2f,0)).rotate(new VectorF(0,0,1), -75).translate(new VectorF(-5,0,-10)));
+        objects.add(new CSG.Union(
+                new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0,1,0), 0.3f,0)).translate(new VectorF(-0.25f,-3,0)),
+                new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(1,0,0), 0.7f,0)).translate(new VectorF(0.25f,0-3,0f))));
+
+        objects.add(new CSG.Intersection(
+                new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(1,1,0), 0.2f,0)).translate(new VectorF(-0.25f,0,0)),
+                new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0,1,1), 0.5f,0)).translate(new VectorF(0.25f,0,0f))));
+
+        objects.add(new CSG.Differenz(
+                new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0.5f,1,0.5f), 0.8f,0)).translate(new VectorF(-0.25f,3,0)),
+                new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(1,1,1), 0.6f,0)).translate(new VectorF(0.25f,3,0f))));
+        //this.objects.add(new Sphere(new Material(new VectorF(1,0,0),0.8f,0), new VectorF(-3,-0,-8f), 1));
+        //this.objects.add(new Sphere(new Material(new VectorF(0,0,1), 0.8f, 0), new VectorF(3f,1.5f,-11f), 2));
+
 
         frame = new JFrame();
         image = new MemoryImageSource(1280, 800, new DirectColorModel(24, 0xff0000, 0xff00, 0xff), new int[1280 * 800], 0, 1280);
@@ -51,16 +62,16 @@ public class Raytracer {
         frame.setVisible(true);
 
         do{
-            //long time = System.currentTimeMillis();
+            long time = System.currentTimeMillis();
             update();
             render();
-            //System.out.println(System.currentTimeMillis() - time + " milliseconds");
+            System.out.println(System.currentTimeMillis() - time + " milliseconds");
             //wait(0);
         }while (true);
     }
 
     float offset = 0;
-    float delta = 0.15f;
+    float delta = 0.2f;
 
     public void update(){
         int resX = cam_Image.imageWidth;
@@ -80,17 +91,20 @@ public class Raytracer {
         for (int y = 0; y < resY; ++y){
             for (int x = 0; x < resX; ++x) {
                 Ray ray = cam_Image.rayToImageLayer(x, y, resX, resY);
-                int index = -1;
-                float intersection = Float.POSITIVE_INFINITY;
+
+                IntersectionPoint intersectionPoint = null;
+                float min = Float.POSITIVE_INFINITY;
                 for (int i = 0; i < objects.size(); i++) {
-                    Float tmp = objects.get(i).intersects(ray);
-                    if(tmp != null && tmp < intersection){
-                        intersection = tmp;
-                        index = i;
+                    List<IntersectionPoint> tmpPoints = objects.get(i).intersects(ray);
+                    IntersectionPoint tmp = null;
+                    if(!tmpPoints.isEmpty()) tmp = tmpPoints.get(0);
+                    if(tmp != null && tmp.intersection != null && tmp.intersection < min){
+                        min = tmp.intersection;
+                        intersectionPoint = tmp;
                     }
                 }
-                if(index >= 0) {
-                    VectorF lighting = light.physicallyBasedLighting(ray.pointOnRay(intersection), objects.get(index));
+                if(intersectionPoint != null) {
+                    VectorF lighting = light.physicallyBasedLighting(ray.pointOnRay(intersectionPoint.intersection), intersectionPoint.figure, ray.origin);
                     pixels[y * resX + x] = (0xFF << 24) | ((int)lighting.x << 16) | ((int)lighting.y << 8) | (int) lighting.z;
                 }else {
                     pixels[y * resX + x] = 0xFF222222;
