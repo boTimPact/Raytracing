@@ -33,17 +33,20 @@ public class Raytracer {
     // Schatten, (optional: mehrere Schatten, weiche Schatten),
     // Lichtkegel,
     // Reflexion (Strahl weiterleiten)
-    Quadric test = new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(1,1,0), 0.6f,0)).scale(new VectorF(1.2f,1.2f,1.2f)).translate(new VectorF(-0.7f,2.3f,0f));
+    Quadric test = new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(1,1,0), 0.13f,0)).scale(new VectorF(1.2f,1.2f,1.2f)).translate(new VectorF(-0.7f,2.3f,0f));
 
     public void init(){
         cam_Image = new Camera_ImageLayer(width, height);
         light = new LightSource(new VectorF(0,0,5), new VectorF(1,1,1), 1.0f, 2.2f);
 
 
+
+        //this.objects.add(new Quadric(0,0,0,0,0,0,0,1,0,-4, new Material(new VectorF(1,0,0),1,0)).translate(new VectorF(0,8,0)));
+
         this.objects.add(new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0.6f,0,1), 0.15f,0)).scale(new VectorF(2,2,2)).translate(new VectorF(5,0,-10)));
         objects.add(new CSG.Union(
-                new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(1,0,0), 0.3f,0)).scale(new VectorF(1.5f, 1.5f, 1.5f)).translate(new VectorF(-0.4f,-3,-0.5f)),
-                new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0,0,1), 0.7f,0)).translate(new VectorF(0.35f,0-3,0f)))
+                new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(1,0,0), 0.2f,0)).scale(new VectorF(1.5f, 1.5f, 1.5f)).translate(new VectorF(-0.4f,-3,-0.5f)),
+                new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0,0,1), 0.4f,0)).translate(new VectorF(0.35f,0-3,0f)))
         );
 
         objects.add(new CSG.Intersection(
@@ -57,7 +60,7 @@ public class Raytracer {
             test)
         );
 
-        objects.add(new Quadric(0,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0,0,1), 0.2f,0)).rotate(new VectorF(0,0,1), -75).rotate(new VectorF(1,0,0), 60).translate(new VectorF(-5,0,-10)));
+        objects.add(new Quadric(0,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0,0,1), 0.2f,0)).rotate(new VectorF(0,0,1), -75).translate(new VectorF(-5,0,-10)));
 //        objects.add(new CSG.Intersection(
 //                new Quadric(0,0,0,0,0,0,0,-1,0,-8, new Material(new VectorF(1,0,0),1,0)).rotate(new VectorF(1,0,0), 20),
 //                new Quadric(0,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0,0,1), 0.2f,0)).rotate(new VectorF(0,0,1), -75).rotate(new VectorF(1,0,0), 20).translate(new VectorF(-5,0,-10))
