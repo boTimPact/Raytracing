@@ -20,12 +20,11 @@ public class LightSource {
     // H = (V+L)/2 (normalisiert)
     public VectorF physicallyBasedLighting(VectorF point, Figure figure, Figure intersectionFigure, VectorF camera){
 
-
         VectorF lightDirection = point.add(this.pos.negate()).negate().normalize();
         VectorF normal = figure.getNormal(point, figure, intersectionFigure);
         VectorF view = camera.add(point.negate()).normalize();
 
-        VectorF h = view.normalize().add(lightDirection.normalize()).normalize();
+        VectorF h = view.add(lightDirection).normalize();
 
         if(normal.dot(lightDirection) < 0) return new VectorF(0,0,0);
 
@@ -40,7 +39,7 @@ public class LightSource {
         this.color = gammaCorrectionDown(this.color, gamma);
         intersectionFigure.material.albedo = gammaCorrectionDown(intersectionFigure.material.albedo, gamma);
 
-        //VectorF light = new VectorF(1,1,1).multiplyScalar(f*d*g);
+        //VectorF light = new VectorF(1,1,1).multiplyScalar(ks);
         VectorF light = this.color.multiplyScalar(brightness * normal.dot(lightDirection.normalize())).multiplyLineByLine(intersectionFigure.material.albedo.multiplyScalar(kd).add(new VectorF(ks,ks,ks)));
 
         this.color = gammaCorrectionUp(this.color, gamma);

@@ -43,6 +43,17 @@ public class Raytracer {
 
         //this.objects.add(new Quadric(0,0,0,0,0,0,0,1,0,-4, new Material(new VectorF(1,0,0),1,0)).translate(new VectorF(0,8,0)));
 
+//        this.objects.add(
+//            new CSG.Intersection(
+//                new CSG.Union(
+//                    new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(1,0,0), 0.13f,0)).translate(new VectorF(.5f,0,-2)),
+//                    new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0,1,0), 0.13f,0)).translate(new VectorF(-.5f,0,-2))
+//                ),
+//                new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0,0,1), 0.13f,0)).translate(new VectorF(0,-1,-1.5f))
+//            )
+//        );
+
+
         this.objects.add(new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0.6f,0,1), 0.15f,0)).scale(new VectorF(2,2,2)).translate(new VectorF(5,0,-10)));
         objects.add(new CSG.Union(
                 new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(1,0,0), 0.2f,0)).scale(new VectorF(1.5f, 1.5f, 1.5f)).translate(new VectorF(-0.4f,-3,-0.5f)),
@@ -60,15 +71,13 @@ public class Raytracer {
             test)
         );
 
+
         objects.add(new Quadric(0,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0,0,1), 0.2f,0)).rotate(new VectorF(0,0,1), -75).translate(new VectorF(-5,0,-10)));
 //        objects.add(new CSG.Intersection(
 //                new Quadric(0,0,0,0,0,0,0,-1,0,-8, new Material(new VectorF(1,0,0),1,0)).rotate(new VectorF(1,0,0), 20),
 //                new Quadric(0,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0,0,1), 0.2f,0)).rotate(new VectorF(0,0,1), -75).rotate(new VectorF(1,0,0), 20).translate(new VectorF(-5,0,-10))
 //        ));
 
-//        this.objects.add(new Sphere(new Material(new VectorF(0,1,0), 0.15f,0), new VectorF(0,0,-2), 2f));
-//        this.objects.add(new Sphere(new Material(new VectorF(1,0,0),0.3f,0), new VectorF(-3,-0,-4f), 1));
-//        this.objects.add(new Sphere(new Material(new VectorF(0,0,1), 0.6f, 0), new VectorF(3f,1.5f,-6.5f), 2));
 
 
         frame = new JFrame();
