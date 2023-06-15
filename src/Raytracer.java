@@ -24,16 +24,16 @@ public class Raytracer {
     private static final int height = 1080;
 
     //TODO:
-
-    // Gammkorrektur (vor der Lichtberechnung in Lichtenergie umrechnen und danach wieder zurück),  ?maybe ready?
-    // Quadik Körper,
-    // Constuctiv solid geometry,
-
+    // Constuctiv solid geometry Verschachtelung,
     // Übung 3:
     // Schatten, (optional: mehrere Schatten, weiche Schatten),
     // Lichtkegel,
     // Reflexion (Strahl weiterleiten)
-    Quadric test = new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(1,1,0), 0.13f,0)).scale(new VectorF(1.2f,1.2f,1.2f)).translate(new VectorF(-0.7f,2.3f,0f));
+    // Refraktion
+    // Optional:
+    // Multithreaded & (UI)
+
+    Quadric test = new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(1,1,0), 0.13f,0, 0)).scale(new VectorF(1.2f,1.2f,1.2f)).translate(new VectorF(-0.7f,2.3f,0f));
 
     public void init(){
         cam_Image = new Camera_ImageLayer(width, height);
@@ -43,36 +43,25 @@ public class Raytracer {
 
         //this.objects.add(new Quadric(0,0,0,0,0,0,0,1,0,-4, new Material(new VectorF(1,0,0),1,0)).translate(new VectorF(0,8,0)));
 
-//        this.objects.add(
-//            new CSG.Intersection(
-//                new CSG.Union(
-//                    new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(1,0,0), 0.13f,0)).translate(new VectorF(.5f,0,-2)),
-//                    new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0,1,0), 0.13f,0)).translate(new VectorF(-.5f,0,-2))
-//                ),
-//                new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0,0,1), 0.13f,0)).translate(new VectorF(0,-1,-1.5f))
-//            )
-//        );
+        this.objects.add(new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0.6f,0,1), 0.15f,0, 0.04f)).scale(new VectorF(2,2,2)).translate(new VectorF(5,0,-10)));
 
-
-        this.objects.add(new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0.6f,0,1), 0.15f,0)).scale(new VectorF(2,2,2)).translate(new VectorF(5,0,-10)));
         objects.add(new CSG.Union(
-                new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(1,0,0), 0.2f,0)).scale(new VectorF(1.5f, 1.5f, 1.5f)).translate(new VectorF(-0.4f,-3,-0.5f)),
-                new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0,0,1), 0.4f,0)).translate(new VectorF(0.35f,0-3,0f)))
+                new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(1,0,0), 0.2f,0, 0.04f)).scale(new VectorF(1.5f, 1.5f, 1.5f)).translate(new VectorF(-0.4f,-3,-0.5f)),
+                new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0,0,1), 0.4f,0, 0.04f)).translate(new VectorF(0.35f,0-3,0f)))
         );
 
         objects.add(new CSG.Intersection(
-                new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(1,1,0), 0.2f,0)).translate(new VectorF(-0.35f,0,-0.3f)),
-                new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0,1,1), 0.5f,0)).translate(new VectorF(0.35f,0,0f)))
+                new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(1,1,0), 0.2f,0, 0.04f)).translate(new VectorF(-0.35f,0,-0.3f)),
+                new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0,1,1), 0.5f,0, 0.04f)).translate(new VectorF(0.35f,0,0f)))
         );
 
 
         objects.add(new CSG.Differenz(
-            new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0.5f,1,0.5f), 0.8f,0)).scale(new VectorF(1.5f,1.5f,1.5f)).translate(new VectorF(-1,2.5f,-0.5f)),
+            new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0.5f,1,0.5f), 0.8f,0, 0.04f)).scale(new VectorF(1.5f,1.5f,1.5f)).translate(new VectorF(-1,2.5f,-0.5f)),
             test)
         );
 
-
-        objects.add(new Quadric(0,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0,0,1), 0.2f,0)).rotate(new VectorF(0,0,1), -75).translate(new VectorF(-5,0,-10)));
+        objects.add(new Quadric(0,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0,0,1), 0.2f,0, 0.04f)).rotate(new VectorF(0,0,1), -75).translate(new VectorF(-5,0,-10)));
 //        objects.add(new CSG.Intersection(
 //                new Quadric(0,0,0,0,0,0,0,-1,0,-8, new Material(new VectorF(1,0,0),1,0)).rotate(new VectorF(1,0,0), 20),
 //                new Quadric(0,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0,0,1), 0.2f,0)).rotate(new VectorF(0,0,1), -75).rotate(new VectorF(1,0,0), 20).translate(new VectorF(-5,0,-10))

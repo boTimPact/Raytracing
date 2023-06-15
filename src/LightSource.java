@@ -28,7 +28,7 @@ public class LightSource {
 
         if(normal.dot(lightDirection) < 0) return new VectorF(0,0,0);
 
-        float f = fresnel(normal.dot(view.normalize()), intersectionFigure.material.metalness);
+        float f = fresnel(normal.dot(view.normalize()), intersectionFigure.material.metalness, intersectionFigure.material.reflectivity);
         float d = normalDistribution(normal.dot(h), intersectionFigure.material.roughness);
         float g = geometry(normal.dot(view.normalize()), normal.dot(lightDirection.normalize()), intersectionFigure.material.roughness);
         //System.out.println("Fresnel: " + f + "\tNormal: " + d + "\tGeometry: " + g);
@@ -57,8 +57,8 @@ public class LightSource {
     float geometry(float ndotv, float ndotl, float roughness){
         return ndotv / (ndotv * (1 - roughness / 2) + roughness / 2) * ndotl / (ndotl * (1 - roughness / 2) + roughness / 2);
     }
-    float fresnel(float ndotv, float metalness){
-        float reflectivity = (float) (0.04 * (1 - metalness));
+    float fresnel(float ndotv, float metalness, float baseReflectivity){
+        float reflectivity = (float) (baseReflectivity * (1 - metalness));
         return reflectivity + (1 - reflectivity) * (float) Math.pow((1 - ndotv), 5);
     }
 
