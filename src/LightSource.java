@@ -36,19 +36,13 @@ public class LightSource {
         float ks = f * d * g;
         float kd = (1 - ks) * (1 - intersectionFigure.material.metalness);
 
-        this.color = gammaCorrectionDown(this.color, gamma);
-        intersectionFigure.material.albedo = gammaCorrectionDown(intersectionFigure.material.albedo, gamma);
-
         //VectorF light = new VectorF(1,1,1).multiplyScalar(ks);
         VectorF light = this.color.multiplyScalar(brightness * normal.dot(lightDirection.normalize())).multiplyLineByLine(intersectionFigure.material.albedo.multiplyScalar(kd).add(new VectorF(ks,ks,ks)));
-
-        this.color = gammaCorrectionUp(this.color, gamma);
-        intersectionFigure.material.albedo = gammaCorrectionUp(intersectionFigure.material.albedo, gamma);
 
         light.x = Math.max(Math.min(light.x, 1), 0);
         light.y = Math.max(Math.min(light.y, 1), 0);
         light.z = Math.max(Math.min(light.z, 1), 0);
-        return light.multiplyScalar(255);
+        return light;
     }
 
     float normalDistribution(float nDotW, float roughness){
@@ -60,20 +54,5 @@ public class LightSource {
     float fresnel(float ndotv, float metalness, float baseReflectivity){
         float reflectivity = (float) (baseReflectivity * (1 - metalness));
         return reflectivity + (1 - reflectivity) * (float) Math.pow((1 - ndotv), 5);
-    }
-
-
-
-    private VectorF gammaCorrectionDown(VectorF light, float gamma){
-        light.x = (float) Math.pow(light.x, gamma);
-        light.y = (float) Math.pow(light.y, gamma);
-        light.z = (float) Math.pow(light.z, gamma);
-        return light;
-    }
-    private VectorF gammaCorrectionUp(VectorF light, float gamma){
-        light.x = (float) Math.pow(light.x, 1/gamma);
-        light.y = (float) Math.pow(light.y, 1/gamma);
-        light.z = (float) Math.pow(light.z, 1/gamma);
-        return light;
     }
 }

@@ -31,9 +31,19 @@ public class Raytracer {
     // Reflexion (Strahl weiterleiten)
     // Refraktion
     // Optional:
-    // Multithreaded & (UI) & Weichzeichner (Filter)
+    // Multithreaded & (UI) & Weichzeichner (Filter),
 
-    Quadric test = new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(1,1,0), 0.13f,0, 0)).scale(new VectorF(1.2f,1.2f,1.2f)).translate(new VectorF(-0.7f,2.3f,0f));
+    // Übung 4 (Nicht alle nötig)
+    // Dreicksnetz Figuren
+    // Objekte einlesen (siehe Computergrafik)
+    // Farbiges Glas (Schattenwurf keine Ablenkung)
+    // Nebel
+    // Andere Körper
+    // Bounding Volume Hierarchy (BVA)
+    //
+
+
+    Quadric test = new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(1,1,0), 0.13f,0, 0, 0)).scale(new VectorF(1.2f,1.2f,1.2f)).translate(new VectorF(-1f,2.3f,0f));
 
     public void init(){
         cam_Image = new Camera_ImageLayer(width, height);
@@ -41,27 +51,27 @@ public class Raytracer {
 
 
 
-        //this.objects.add(new Quadric(0,0,0,0,0,0,0,1,0,-4, new Material(new VectorF(1,0,0),1,0)).translate(new VectorF(0,8,0)));
+//        this.objects.add(new Quadric(0,0,0,0,0,0,0,1,0,-4, new Material(new VectorF(1,0,0),1,0)).translate(new VectorF(0,8,0)));
 
-        this.objects.add(new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0.6f,0,1), 0.15f,0, 0.04f)).scale(new VectorF(2,2,2)).translate(new VectorF(5,0,-10)));
+        this.objects.add(new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0.6f,0,1), 0.15f,0, 0.6f, 0)).scale(new VectorF(2,2,2)).translate(new VectorF(5,0,-10)));
 
         objects.add(new CSG.Union(
-                new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(1,0,0), 0.2f,0, 0.04f)).scale(new VectorF(1.5f, 1.5f, 1.5f)).translate(new VectorF(-0.4f,-3,-0.5f)),
-                new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0,0,1), 0.4f,0, 0.04f)).translate(new VectorF(0.35f,0-3,0f)))
+                new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(1,0,0), 0.2f,0, 0, 0)).scale(new VectorF(1.5f, 1.5f, 1.5f)).translate(new VectorF(0,-2,-3-3)),
+                new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0,0,1), 0.4f,0, 0, 0)).translate(new VectorF(0.5f,-2,-2.5f-3)))
         );
 
         objects.add(new CSG.Intersection(
-                new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(1,1,0), 0.2f,0, 0.04f)).translate(new VectorF(-0.35f,0,-0.3f)),
-                new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0,1,1), 0.5f,0, 0.04f)).translate(new VectorF(0.35f,0,0f)))
+                new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(1,1,0), 0.2f,0, 0, 0)).translate(new VectorF(-0.35f,0,-0.3f)),
+                new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0,1,1), 0.5f,0, 0, 0)).translate(new VectorF(0.35f,0,0f)))
         );
 
 
         objects.add(new CSG.Differenz(
-            new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0.5f,1,0.5f), 0.8f,0, 0.04f)).scale(new VectorF(1.5f,1.5f,1.5f)).translate(new VectorF(-1,2.5f,-0.5f)),
+            new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0.5f,1,0.5f), 0.8f,0, 0, 0)).scale(new VectorF(1.5f,1.5f,1.5f)).translate(new VectorF(-1,2.5f,-0.5f)),
             test)
         );
 
-        objects.add(new Quadric(0,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0,0,1), 0.2f,0, 0.04f)).rotate(new VectorF(0,0,1), -75).translate(new VectorF(-5,0,-10)));
+        objects.add(new Quadric(0,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0,0,1), 0.1f,0, 0, 0)).rotate(new VectorF(0,0,1), -75).translate(new VectorF(-5,0,-10)));
 //        objects.add(new CSG.Intersection(
 //                new Quadric(0,0,0,0,0,0,0,-1,0,-8, new Material(new VectorF(1,0,0),1,0)).rotate(new VectorF(1,0,0), 20),
 //                new Quadric(0,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0,0,1), 0.2f,0)).rotate(new VectorF(0,0,1), -75).rotate(new VectorF(1,0,0), 20).translate(new VectorF(-5,0,-10))
@@ -108,25 +118,10 @@ public class Raytracer {
             for (int x = 0; x < resX; ++x) {
                 Ray ray = cam_Image.rayToImageLayer(x, y, resX, resY);
 
-                IntersectionPoint intersectionPoint = null;
-                float min = Float.POSITIVE_INFINITY;
-                int index = -1;
-                for (int i = 0; i < objects.size(); i++) {
-                    List<IntersectionPoint> tmpPoints = objects.get(i).intersects(ray);
-                    IntersectionPoint tmp = null;
-                    if(!tmpPoints.isEmpty()) tmp = tmpPoints.get(0);
-                    if(tmp != null && tmp.intersection != null && tmp.intersection < min){
-                        min = tmp.intersection;
-                        index = i;
-                        intersectionPoint = tmp;
-                    }
-                }
-                if(intersectionPoint != null) {
-                    VectorF lighting = light.physicallyBasedLighting(ray.pointOnRay(intersectionPoint.intersection), objects.get(index), intersectionPoint.figure, ray.origin);
-                    pixels[y * resX + x] = (0xFF << 24) | ((int)lighting.x << 16) | ((int)lighting.y << 8) | (int) lighting.z;
-                }else {
-                    pixels[y * resX + x] = 0xFF222222;
-                }
+                VectorF color = getColor(ray, 4);
+                color = gammaCorrectionUp(color, 2.2f);
+                color = color.multiplyScalar(255);
+                pixels[y * resX + x] = (0xFF << 24) | ((int)color.x << 16) | ((int)color.y << 8) | (int) color.z;
             }
         }
         image = new MemoryImageSource(resX, resY, new DirectColorModel(24, 0xff0000, 0xff00, 0xff), pixels, 0, resX);
@@ -137,6 +132,59 @@ public class Raytracer {
         imageLabel.setIcon(new ImageIcon(i));
     }
 
+
+    private VectorF getColor(Ray ray, int depth){
+        VectorF color = new VectorF(0,0,0);
+
+        if(depth == 0) return color;
+
+        IntersectionPoint intersectionPoint = null;
+        float min = Float.POSITIVE_INFINITY;
+        int index = -1;
+        for (int i = 0; i < objects.size(); i++) {
+            List<IntersectionPoint> tmpPoints = objects.get(i).intersects(ray);
+            IntersectionPoint tmp = null;
+            if(!tmpPoints.isEmpty()) tmp = tmpPoints.get(0);
+            if(tmp != null && tmp.intersection != null && tmp.intersection < min){
+                min = tmp.intersection;
+                index = i;
+                intersectionPoint = tmp;
+            }
+        }
+        if(intersectionPoint == null) {
+            return new VectorF(0.05f,0.05f,0.05f);
+        }
+        VectorF point = ray.pointOnRay(intersectionPoint.intersection);
+        color = color.add(light.physicallyBasedLighting(point, objects.get(index), intersectionPoint.figure, ray.origin)).multiplyScalar(1 - intersectionPoint.figure.material.reflectivity);
+        if(intersectionPoint.figure.material.reflectivity > 0){
+            color = color.add(getColor(getReflectionRay(ray, intersectionPoint.intersection, intersectionPoint.figure.getNormal(point, objects.get(index), intersectionPoint.figure)), depth - 1)).multiplyScalar(intersectionPoint.figure.material.reflectivity);
+            color = color.multiplyScalar(1/2f);
+        }
+        if(intersectionPoint.figure.material.transmission > 0){
+            color = color.add(getColor(ray, 0)); //TODO getColor(refractionRay)
+        }
+
+        color.x = Math.max(Math.min(color.x, 1), 0);
+        color.y = Math.max(Math.min(color.y, 1), 0);
+        color.z = Math.max(Math.min(color.z, 1), 0);
+        return color;
+    }
+
+
+    private Ray getReflectionRay(Ray ray, float s, VectorF normal){
+        VectorF newOrigin = ray.pointOnRay(s);
+        VectorF newDirection = ray.direction.add(normal.multiplyScalar(-2 * normal.dot(ray.direction)));
+        return  new Ray(newOrigin, newDirection);
+    }
+
+
+    private VectorF gammaCorrectionUp(VectorF light, float gamma){
+        light.x = (float) Math.pow(light.x, 1/gamma);
+        light.y = (float) Math.pow(light.y, 1/gamma);
+        light.z = (float) Math.pow(light.z, 1/gamma);
+        return light;
+    }
+
     private void wait(int ms){
         try{
             Thread.sleep(ms);
@@ -144,9 +192,6 @@ public class Raytracer {
             System.err.format("IOException: %s%n", e);
         }
     }
-
-
-
 
     public static void main(String[] args) {
         Raytracer raytracer = new Raytracer();
