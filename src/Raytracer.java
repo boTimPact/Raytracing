@@ -31,7 +31,7 @@ public class Raytracer {
     // Reflexion (Strahl weiterleiten)
     // Refraktion
     // Optional:
-    // Multithreaded & (UI)
+    // Multithreaded & (UI) & Weichzeichner (Filter)
 
     Quadric test = new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(1,1,0), 0.13f,0, 0)).scale(new VectorF(1.2f,1.2f,1.2f)).translate(new VectorF(-0.7f,2.3f,0f));
 
