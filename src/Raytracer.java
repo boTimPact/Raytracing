@@ -10,6 +10,7 @@ import java.util.List;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.plaf.synth.SynthOptionPaneUI;
 
 public class Raytracer {
 
@@ -24,8 +25,6 @@ public class Raytracer {
     private static final int height = 1080;
 
     //TODO:
-
-    // Gammkorrektur (vor der Lichtberechnung in Lichtenergie umrechnen und danach wieder zurück),  ?maybe ready?
     // Quadik Körper,
     // Constuctiv solid geometry,
 
@@ -94,16 +93,14 @@ public class Raytracer {
             render();
             System.out.println(System.currentTimeMillis() - time + " milliseconds");
             //wait(0);
-        }while (true);
+        }while (false);
     }
 
     float offset = 0;
     float delta = 0.4f;
 
     public void update(){
-        int resX = cam_Image.imageWidth;
-        int resY = cam_Image.imageHeight;
-        int[] pixels = new int[resX * resY];
+        int[] pixels = new int[width * height];
 
         offset += delta;
         if(offset > 10 || offset < -10){
@@ -115,9 +112,14 @@ public class Raytracer {
 //        Sphere moveing = (Sphere)objects.get(2);
 //        moveing.mid.y = offset;
 
-        for (int y = 0; y < resY; ++y){
-            for (int x = 0; x < resX; ++x) {
-                Ray ray = cam_Image.rayToImageLayer(x, y, resX, resY);
+
+        int threadCount = Thread.activeCount();
+        System.out.println(threadCount);
+
+        for (int y = 0; y < height; ++y){
+            for (int x = 0; x < width; ++x) {
+
+                Ray ray = cam_Image.rayToImageLayer(x, y, width, height);
 
                 IntersectionPoint intersectionPoint = null;
                 float min = Float.POSITIVE_INFINITY;
@@ -134,13 +136,14 @@ public class Raytracer {
                 }
                 if(intersectionPoint != null) {
                     VectorF lighting = light.physicallyBasedLighting(ray.pointOnRay(intersectionPoint.intersection), objects.get(index), intersectionPoint.figure, ray.origin);
-                    pixels[y * resX + x] = (0xFF << 24) | ((int)lighting.x << 16) | ((int)lighting.y << 8) | (int) lighting.z;
+                    System.out.println(lighting);
+                    pixels[y * width + x] = (0xFF << 24) | ((int)lighting.x << 16) | ((int)lighting.y << 8) | (int) lighting.z;
                 }else {
-                    pixels[y * resX + x] = 0xFF222222;
+                    pixels[y * width + x] = 0xFF222222;
                 }
             }
         }
-        image = new MemoryImageSource(resX, resY, new DirectColorModel(24, 0xff0000, 0xff00, 0xff), pixels, 0, resX);
+        image = new MemoryImageSource(width, height, new DirectColorModel(24, 0xff0000, 0xff00, 0xff), pixels, 0, width);
     }
 
     public void render(){

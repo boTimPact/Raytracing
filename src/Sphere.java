@@ -30,14 +30,14 @@ public class Sphere extends  Figure{
         if(discriminant < 0) return out;
 
         if(a == 0) {
-            out.add(new IntersectionPoint(-c/b, this));
+            out.add(new IntersectionPoint(-c/b, this, false));
             return out;
         }
 
         //(-b - [Vorzeichen von b] * √(b2 - 4ac))/2
         float k = (float) (-b - Math.signum(b) * Math.sqrt(discriminant)) / 2;
-        out.add(new IntersectionPoint(Math.min(c/k, k/a), this));
-        out.add(new IntersectionPoint(Math.max(c/k, k/a), this));
+        out.add(new IntersectionPoint(Math.min(c/k, k/a), this, true));
+        out.add(new IntersectionPoint(Math.max(c/k, k/a), this, false));
         return out;
     }
 

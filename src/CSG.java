@@ -20,22 +20,13 @@ abstract class CSG extends Figure{
         List<IntersectionPoint> intersects(Ray ray) {
             List<IntersectionPoint> out = new LinkedList<>();
 
-            List<IntersectionPoint> intersectionPoints = new LinkedList<>();
+            out.addAll(a.intersects(ray));
+            out.addAll(b.intersects(ray));
 
-            intersectionPoints.addAll(a.intersects(ray));
-            intersectionPoints.addAll(b.intersects(ray));
-
-            if(intersectionPoints.size() < 2) return out;
-
-            intersectionPoints.sort(new Comparator<IntersectionPoint>() {
-                @Override
-                public int compare(IntersectionPoint o1, IntersectionPoint o2) {
-                    return Float.compare(o1.intersection, o2.intersection);
-                }
+            out.sort((p1, p2) -> {
+                return Float.compare(p1.intersection, p2.intersection);
             });
 
-            out.add(intersectionPoints.get(0));
-            out.add(intersectionPoints.get(intersectionPoints.size()-1));
             return out;
         }
 
@@ -73,21 +64,13 @@ abstract class CSG extends Figure{
 
             if(intersectionPointsA.isEmpty() || intersectionPointsB.isEmpty()) return out;
 
-            List<IntersectionPoint> intersectionPoints = new LinkedList<>();
-            intersectionPoints.addAll(intersectionPointsA);
-            intersectionPoints.addAll(intersectionPointsB);
+            out.addAll(intersectionPointsA);
+            out.addAll(intersectionPointsB);
 
-
-            //TODO: fix for planes
-            intersectionPoints.sort(new Comparator<IntersectionPoint>() {
-                @Override
-                public int compare(IntersectionPoint o1, IntersectionPoint o2) {
-                    return Float.compare(o1.intersection, o2.intersection);
-                }
+            out.sort((p1, p2) -> {
+                return Float.compare(p1.intersection, p2.intersection);
             });
 
-            out.add(intersectionPoints.get(1));
-            out.add(intersectionPoints.get(2));
             return out;
         }
 
