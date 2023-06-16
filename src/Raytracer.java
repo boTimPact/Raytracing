@@ -53,11 +53,11 @@ public class Raytracer {
 
 //        this.objects.add(new Quadric(0,0,0,0,0,0,0,1,0,-4, new Material(new VectorF(1,0,0),1,0)).translate(new VectorF(0,8,0)));
 
-        this.objects.add(new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0.6f,0,1), 0.15f,0, 0.6f, 0)).scale(new VectorF(2,2,2)).translate(new VectorF(5,0,-10)));
+        this.objects.add(new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0.6f,0,1), 0.2f,0, 0.8f, 0)).scale(new VectorF(2,2,2)).translate(new VectorF(5,0,-10)));
 
         objects.add(new CSG.Union(
                 new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(1,0,0), 0.2f,0, 0, 0)).scale(new VectorF(1.5f, 1.5f, 1.5f)).translate(new VectorF(0,-2,-3-3)),
-                new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0,0,1), 0.4f,0, 0, 0)).translate(new VectorF(0.5f,-2,-2.5f-3)))
+                new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0,0,1), 0.4f,0, 0.6f, 0)).translate(new VectorF(0.5f,-2,-2.5f-3)))
         );
 
         objects.add(new CSG.Intersection(
@@ -155,14 +155,18 @@ public class Raytracer {
             return new VectorF(0.05f,0.05f,0.05f);
         }
         VectorF point = ray.pointOnRay(intersectionPoint.intersection);
-        color = color.add(light.physicallyBasedLighting(point, objects.get(index), intersectionPoint.figure, ray.origin)).multiplyScalar(1 - intersectionPoint.figure.material.reflectivity);
+        VectorF normalVec = intersectionPoint.figure.getNormal(point, objects.get(index), intersectionPoint.figure);
+        //if(!isInShadow(point, normalVec)){
+            color = color.add(intersectionPoint.figure.material.albedo).multiplyScalar(1 - intersectionPoint.figure.material.reflectivity);
+        //}
         if(intersectionPoint.figure.material.reflectivity > 0){
-            color = color.add(getColor(getReflectionRay(ray, intersectionPoint.intersection, intersectionPoint.figure.getNormal(point, objects.get(index), intersectionPoint.figure)), depth - 1)).multiplyScalar(intersectionPoint.figure.material.reflectivity);
-            color = color.multiplyScalar(1/2f);
+            color = color.add(getColor(getReflectionRay(ray, intersectionPoint.intersection, normalVec), depth - 1)).multiplyScalar(intersectionPoint.figure.material.reflectivity);
         }
         if(intersectionPoint.figure.material.transmission > 0){
             color = color.add(getColor(ray, 0)); //TODO getColor(refractionRay)
         }
+
+        color = light.physicallyBasedLighting(point, objects.get(index), intersectionPoint.figure, ray.origin, color);
 
         color.x = Math.max(Math.min(color.x, 1), 0);
         color.y = Math.max(Math.min(color.y, 1), 0);
@@ -174,7 +178,16 @@ public class Raytracer {
     private Ray getReflectionRay(Ray ray, float s, VectorF normal){
         VectorF newOrigin = ray.pointOnRay(s);
         VectorF newDirection = ray.direction.add(normal.multiplyScalar(-2 * normal.dot(ray.direction)));
-        return  new Ray(newOrigin, newDirection);
+        return  new Ray(newOrigin.add(normal.multiplyScalar(0.001f)), newDirection.negate());
+    }
+
+    private boolean isInShadow(VectorF point, VectorF normal){
+        Ray toLight = new Ray(point.add(normal.multiplyScalar(0.001f)), this.light.pos.add(point.negate()));
+        for (int i = 0; i < objects.size(); i++) {
+            List<IntersectionPoint> tmpPoints = objects.get(i).intersects(toLight);
+            if(!tmpPoints.isEmpty()) return true;
+        }
+        return false;
     }
 
 
