@@ -6,6 +6,7 @@ import java.awt.image.DirectColorModel;
 import java.awt.image.MemoryImageSource;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.*;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -22,6 +23,7 @@ public class Raytracer {
 
     private static final int width = 1920;
     private static final int height = 1080;
+
 
     //TODO:
     // Constuctiv solid geometry Verschachtelung,
@@ -93,13 +95,14 @@ public class Raytracer {
             render();
             System.out.println(System.currentTimeMillis() - time + " milliseconds");
             //wait(0);
-        }while (true);
+        }while (false);
     }
 
     float offset = 0;
     float delta = 0.4f;
 
     public void update(){
+
         int resX = cam_Image.imageWidth;
         int resY = cam_Image.imageHeight;
         int[] pixels = new int[resX * resY];
@@ -111,6 +114,10 @@ public class Raytracer {
         light.pos.x = -offset;
         light.pos.y = offset;
 
+        int threadcount = Runtime.getRuntime().availableProcessors();
+        ArrayBlockingQueue queue =  new ArrayBlockingQueue<>(16);
+        ExecutorService service = new ThreadPoolExecutor(threadcount, threadcount, 100, TimeUnit.MILLISECONDS, queue);
+
 //        Sphere moveing = (Sphere)objects.get(2);
 //        moveing.mid.y = offset;
 
@@ -118,12 +125,14 @@ public class Raytracer {
             for (int x = 0; x < resX; ++x) {
                 Ray ray = cam_Image.rayToImageLayer(x, y, resX, resY);
 
-                VectorF color = getColor(ray, 4);
-                color = gammaCorrectionUp(color, 2.2f);
-                color = color.multiplyScalar(255);
-                pixels[y * resX + x] = (0xFF << 24) | ((int)color.x << 16) | ((int)color.y << 8) | (int) color.z;
+                service.submit(new Raytrace(pixels, ray, x, y));
+                while (queue.size() >= 15){
+                    //System.out.println("Wait for available Thread!");
+                }
             }
         }
+        service.shutdown();
+        while (!service.isTerminated())
         image = new MemoryImageSource(resX, resY, new DirectColorModel(24, 0xff0000, 0xff00, 0xff), pixels, 0, resX);
     }
 
@@ -205,6 +214,40 @@ public class Raytracer {
             System.err.format("IOException: %s%n", e);
         }
     }
+
+
+    private class Raytrace implements Runnable{
+
+        private int pixels[];
+        private Ray ray;
+        private int x;
+        private int y;
+
+
+        public Raytrace(int[] pixels, Ray ray, int x, int y) {
+            this.pixels = pixels;
+            this.ray = ray;
+            this.x = x;
+            this.y = y;
+        }
+
+        @Override
+        public void run() {
+//            System.out.println(Thread.currentThread().getName() + " " +this.ray);
+//            System.out.println(Thread.currentThread().getName() + " " +this.x);
+//            System.out.println(Thread.currentThread().getName() + " " +this.y);
+
+            VectorF color = getColor(ray, 4);
+//            if(color.x != 0.05) {
+//                System.out.println(color);
+//            }
+            color = gammaCorrectionUp(color, 2.2f);
+            color = color.multiplyScalar(255);
+            pixels[y * width + x] = (0xFF << 24) | ((int)color.x << 16) | ((int)color.y << 8) | (int) color.z;
+//            pixels[y * width + x] = (0xFF << 24) | (0x22 << 16) | (0x22 << 8) | 0x22;
+        }
+    }
+
 
     public static void main(String[] args) {
         Raytracer raytracer = new Raytracer();
