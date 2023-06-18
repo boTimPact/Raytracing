@@ -12,4 +12,12 @@ public class Ray {
     public VectorF pointOnRay(float s){
         return origin.add(direction.normalize().multiplyScalar(s));
     }
+
+    @Override
+    public String toString() {
+        return "Ray{" +
+                "origin=" + origin +
+                ", direction=" + direction +
+                '}';
+    }
 }
