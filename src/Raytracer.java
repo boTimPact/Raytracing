@@ -21,8 +21,13 @@ public class Raytracer {
     JLabel imageLabel;
     MemoryImageSource image;
 
-    private static final int width = 1920;
-    private static final int height = 1080;
+    private ExecutorService service;
+    int[] pixels;
+
+    private static final int WIDTH = 1920;
+    private static final int HEIGHT = 1080;
+    private static final int THREAD_NUMBER = Runtime.getRuntime().availableProcessors();
+    private static final int CHUNK_SIZE = HEIGHT / THREAD_NUMBER;
 
 
     //TODO:
@@ -45,35 +50,36 @@ public class Raytracer {
     //
 
 
-    Quadric test = new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(1,1,0), 0.13f,0, 0, 0)).scale(new VectorF(1.2f,1.2f,1.2f)).translate(new VectorF(-1f,2.3f,0f));
+    Quadric test = new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(1,1,0), 0.3f,0, false, 0)).scale(new VectorF(1.2f,1.2f,1.2f)).translate(new VectorF(-1f,2.3f,0f));
 
     public void init(){
-        cam_Image = new Camera_ImageLayer(width, height);
+        pixels = new int[WIDTH * HEIGHT];
+        cam_Image = new Camera_ImageLayer(WIDTH, HEIGHT);
         light = new LightSource(new VectorF(0,0,5), new VectorF(1,1,1), 1.0f, 2.2f);
 
 
 
 //        this.objects.add(new Quadric(0,0,0,0,0,0,0,1,0,-4, new Material(new VectorF(1,0,0),1,0)).translate(new VectorF(0,8,0)));
 
-        this.objects.add(new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0.6f,0,1), 0.2f,0, 0.8f, 0)).scale(new VectorF(2,2,2)).translate(new VectorF(5,0,-10)));
+        this.objects.add(new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0.6f,0,1), 0.3f,0, true, 0)).scale(new VectorF(2,2,2)).translate(new VectorF(5,0,-10)));
 
         objects.add(new CSG.Union(
-                new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(1,0,0), 0.2f,0, 0, 0)).scale(new VectorF(1.5f, 1.5f, 1.5f)).translate(new VectorF(0,-2,-3-3)),
-                new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0,0,1), 0.4f,0, 0.6f, 0)).translate(new VectorF(0.5f,-2,-2.5f-3)))
+                new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(1,0,0), 0.2f,0, false, 0)).scale(new VectorF(1.5f, 1.5f, 1.5f)).translate(new VectorF(0,-2,-3-3)),
+                new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0,0,1), 0.4f,0, true, 0)).translate(new VectorF(0.5f,-2,-2.5f-3)))
         );
 
         objects.add(new CSG.Intersection(
-                new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(1,1,0), 0.2f,0, 0, 0)).translate(new VectorF(-0.35f,0,-0.3f)),
-                new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0,1,1), 0.5f,0, 0, 0)).translate(new VectorF(0.35f,0,0f)))
+                new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(1,1,0), 0.2f,0, false, 0)).translate(new VectorF(-0.35f,0,-0.3f)),
+                new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0,1,1), 0.5f,0, false, 0)).translate(new VectorF(0.35f,0,0f)))
         );
 
 
         objects.add(new CSG.Differenz(
-            new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0.5f,1,0.5f), 0.8f,0, 0, 0)).scale(new VectorF(1.5f,1.5f,1.5f)).translate(new VectorF(-1,2.5f,-0.5f)),
+            new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0.5f,1,0.5f), 0.8f,0, false, 0)).scale(new VectorF(1.5f,1.5f,1.5f)).translate(new VectorF(-1,2.5f,-0.5f)),
             test)
         );
 
-        objects.add(new Quadric(0,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0,0,1), 0.1f,0, 0, 0)).rotate(new VectorF(0,0,1), -75).translate(new VectorF(-5,0,-10)));
+        objects.add(new Quadric(0,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0,0,1), 0.35f,0, true, 0)).rotate(new VectorF(0,0,1), -75).translate(new VectorF(-5,0,-10)));
 //        objects.add(new CSG.Intersection(
 //                new Quadric(0,0,0,0,0,0,0,-1,0,-8, new Material(new VectorF(1,0,0),1,0)).rotate(new VectorF(1,0,0), 20),
 //                new Quadric(0,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0,0,1), 0.2f,0)).rotate(new VectorF(0,0,1), -75).rotate(new VectorF(1,0,0), 20).translate(new VectorF(-5,0,-10))
@@ -82,7 +88,7 @@ public class Raytracer {
 
 
         frame = new JFrame();
-        image = new MemoryImageSource(width, height, new DirectColorModel(24, 0xff0000, 0xff00, 0xff), new int[width * height], 0, width);
+        image = new MemoryImageSource(WIDTH, HEIGHT, new DirectColorModel(24, 0xff0000, 0xff00, 0xff), new int[WIDTH * HEIGHT], 0, WIDTH);
         imageLabel = new JLabel(new ImageIcon(Toolkit.getDefaultToolkit().createImage(image)));
         frame.add(imageLabel);
         frame.pack();
@@ -94,18 +100,17 @@ public class Raytracer {
             update();
             render();
             System.out.println(System.currentTimeMillis() - time + " milliseconds");
+            System.out.println(1000 / (System.currentTimeMillis() - time) + " fps\n");
             //wait(0);
-        }while (false);
+        }while (true);
     }
 
     float offset = 0;
-    float delta = 0.4f;
+    float delta = 0.09f;
 
     public void update(){
 
-        int resX = cam_Image.imageWidth;
-        int resY = cam_Image.imageHeight;
-        int[] pixels = new int[resX * resY];
+        service = Executors.newFixedThreadPool(THREAD_NUMBER);
 
         offset += delta;
         if(offset > 10 || offset < -10){
@@ -114,26 +119,17 @@ public class Raytracer {
         light.pos.x = -offset;
         light.pos.y = offset;
 
-        int threadcount = Runtime.getRuntime().availableProcessors();
-        ArrayBlockingQueue queue =  new ArrayBlockingQueue<>(16);
-        ExecutorService service = new ThreadPoolExecutor(threadcount, threadcount, 100, TimeUnit.MILLISECONDS, queue);
-
 //        Sphere moveing = (Sphere)objects.get(2);
 //        moveing.mid.y = offset;
 
-        for (int y = 0; y < resY; ++y){
-            for (int x = 0; x < resX; ++x) {
-                Ray ray = cam_Image.rayToImageLayer(x, y, resX, resY);
-
-                service.submit(new Raytrace(pixels, ray, x, y));
-                while (queue.size() >= 15){
-                    //System.out.println("Wait for available Thread!");
-                }
-            }
+        for (int i = 0; i < THREAD_NUMBER; i++) {
+            int startY = i * CHUNK_SIZE;
+            service.submit(new RaytraceTask(pixels, startY, startY + CHUNK_SIZE));
         }
+
         service.shutdown();
         while (!service.isTerminated())
-        image = new MemoryImageSource(resX, resY, new DirectColorModel(24, 0xff0000, 0xff00, 0xff), pixels, 0, resX);
+        image = new MemoryImageSource(WIDTH, HEIGHT, new DirectColorModel(24, 0xff0000, 0xff00, 0xff), pixels, 0, WIDTH);
     }
 
     public void render(){
@@ -165,6 +161,8 @@ public class Raytracer {
         }
         VectorF point = ray.pointOnRay(intersectionPoint.intersection);
         VectorF normalVec = intersectionPoint.figure.getNormal(point, objects.get(index), intersectionPoint.figure);
+
+
         //if(!isInShadow(point, normalVec)){
             color = color.add(intersectionPoint.figure.material.albedo).multiplyScalar(1 - intersectionPoint.figure.material.reflectivity);
         //}
@@ -216,35 +214,31 @@ public class Raytracer {
     }
 
 
-    private class Raytrace implements Runnable{
+    private class RaytraceTask implements Runnable{
 
         private int pixels[];
-        private Ray ray;
-        private int x;
-        private int y;
+        private int startY;
+        private int endY;
 
-
-        public Raytrace(int[] pixels, Ray ray, int x, int y) {
+        public RaytraceTask(int[] pixels, int startY, int endY) {
             this.pixels = pixels;
-            this.ray = ray;
-            this.x = x;
-            this.y = y;
+            this.startY = startY;
+            this.endY = endY;
         }
 
         @Override
         public void run() {
-//            System.out.println(Thread.currentThread().getName() + " " +this.ray);
-//            System.out.println(Thread.currentThread().getName() + " " +this.x);
-//            System.out.println(Thread.currentThread().getName() + " " +this.y);
 
-            VectorF color = getColor(ray, 4);
-//            if(color.x != 0.05) {
-//                System.out.println(color);
-//            }
-            color = gammaCorrectionUp(color, 2.2f);
-            color = color.multiplyScalar(255);
-            pixels[y * width + x] = (0xFF << 24) | ((int)color.x << 16) | ((int)color.y << 8) | (int) color.z;
-//            pixels[y * width + x] = (0xFF << 24) | (0x22 << 16) | (0x22 << 8) | 0x22;
+            for (int y = startY; y < endY; ++y){
+                for (int x = 0; x < WIDTH; ++x) {
+                    Ray ray = cam_Image.rayToImageLayer(x, y, WIDTH, HEIGHT);
+
+                    VectorF color = getColor(ray, 4);
+                    color = gammaCorrectionUp(color, 2.2f);
+                    color = color.multiplyScalar(255);
+                    pixels[y * WIDTH + x] = (0xFF << 24) | ((int)color.x << 16) | ((int)color.y << 8) | (int) color.z;
+                }
+            }
         }
     }
 
