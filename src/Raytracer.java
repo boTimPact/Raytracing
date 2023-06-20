@@ -163,9 +163,9 @@ public class Raytracer {
         VectorF normalVec = intersectionPoint.figure.getNormal(point, objects.get(index), intersectionPoint.figure);
 
 
-        //if(!isInShadow(point, normalVec)){
+        if(!isInShadow(point, normalVec)){
             color = color.add(intersectionPoint.figure.material.albedo).multiplyScalar(1 - intersectionPoint.figure.material.reflectivity);
-        //}
+        }
         if(intersectionPoint.figure.material.reflectivity > 0){
             color = color.add(getColor(getReflectionRay(ray, intersectionPoint.intersection, normalVec), depth - 1)).multiplyScalar(intersectionPoint.figure.material.reflectivity);
         }
@@ -192,7 +192,15 @@ public class Raytracer {
         Ray toLight = new Ray(point.add(normal.multiplyScalar(0.001f)), this.light.pos.add(point.negate()));
         for (int i = 0; i < objects.size(); i++) {
             List<IntersectionPoint> tmpPoints = objects.get(i).intersects(toLight);
-            if(!tmpPoints.isEmpty()) return true;
+            if(!tmpPoints.isEmpty()){
+                boolean isRayIntersected = false;
+                for (int j = 0; j < tmpPoints.size(); j++) {
+                    if(tmpPoints.get(j).intersection > 0){
+                        isRayIntersected = true;
+                    }
+                }
+                return isRayIntersected;
+            }
         }
         return false;
     }
