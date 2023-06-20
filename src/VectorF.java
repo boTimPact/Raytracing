@@ -114,6 +114,11 @@ public class VectorF {
     }
 
     @Override
+    public VectorF clone(){
+        return new VectorF(this.x, this.y, this.z, this.z);
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;

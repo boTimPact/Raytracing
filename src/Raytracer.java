@@ -55,18 +55,24 @@ public class Raytracer {
     public void init(){
         pixels = new int[WIDTH * HEIGHT];
         cam_Image = new Camera_ImageLayer(WIDTH, HEIGHT);
-        light = new LightSource(new VectorF(0,0,5), new VectorF(1,1,1), 1.0f, 2.2f);
+        light = new LightSource(new VectorF(0,-5,15), new VectorF(1,1,1), 1f, 2.2f);
 
+
+        this.objects.add(new Sphere(new Material(new VectorF(0,0,1), 0.3f, 0, false, 0, Material.SUBSTANCE.SOLID), new VectorF(-3,0,-5), 2));
+        this.objects.add(new Sphere(new Material(new VectorF(1,1,1), 0.08f, 0, true, 0, Material.SUBSTANCE.SOLID), new VectorF(3,0,-5), 2));
+//        this.objects.add(new Sphere(new Material(new VectorF(1,1,1), 0, 0, false, 1f, Material.SUBSTANCE.GLASS), new VectorF(-2,0,-1), 2));
+
+        this.objects.add(new Sphere(new Material(new VectorF(1,1,0), 1, 0, false, 0, Material.SUBSTANCE.SOLID), new VectorF(0,1020,-1000), 980));
 
 
 //        this.objects.add(new Quadric(0,0,0,0,0,0,0,1,0,-4, new Material(new VectorF(1,0,0),1,0)).translate(new VectorF(0,8,0)));
 
 //        this.objects.add(new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0.6f,0,1), 0.3f,0, true, 0, Material.SUBSTANCE.GLASS)).scale(new VectorF(2,2,2)).translate(new VectorF(5,0,-10)));
 //
-//        objects.add(new CSG.Union(
-//                new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(1,0,0), 0.2f,0, false, 0)).scale(new VectorF(1.5f, 1.5f, 1.5f)).translate(new VectorF(0,-2,-3-3)),
-//                new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0,0,1), 0.4f,0, true, 0)).translate(new VectorF(0.5f,-2,-2.5f-3)))
-//        );
+        objects.add(new CSG.Union(
+                new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(1,0,0), 0.2f,0, false, 0, Material.SUBSTANCE.SOLID)).scale(new VectorF(1.5f, 1.5f, 1.5f)).translate(new VectorF(0,-2,-3-3)),
+                new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0,0,1), 0.9f,0, true, 0, Material.SUBSTANCE.SOLID)).translate(new VectorF(0.5f,-2,-2.5f-3)))
+        );
 //
 //        objects.add(new CSG.Intersection(
 //                new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(1,1,0), 0.2f,0, false, 0)).translate(new VectorF(-0.35f,0,-0.3f)),
@@ -106,26 +112,44 @@ public class Raytracer {
     }
 
     float offset = 0;
-    float delta = 0.09f;
+    float delta = 0.03f;
 
     public void update(){
 
         service = Executors.newFixedThreadPool(THREAD_NUMBER);
 
         offset += delta;
-        if(offset > 10 || offset < -10){
-            delta *= -1;
-        }
-        light.pos.x = -offset;
-        light.pos.y = offset;
+//        if(offset > 10 || offset < -10){
+//            delta *= -1;
+//        }
+//        light.pos.x = -offset;
+//        light.pos.y = offset;
+        Matrix4f rotMat = new Matrix4f().rotateY(delta);
+        light.pos = light.pos.multiplyMatrix(rotMat);
 
 //        Sphere moveing = (Sphere)objects.get(2);
 //        moveing.mid.y = offset;
 
         for (int i = 0; i < THREAD_NUMBER; i++) {
             int startY = i * CHUNK_SIZE;
-            service.submit(new RaytraceTask(pixels, startY, startY + CHUNK_SIZE));
+            int endY = i == THREAD_NUMBER - 1 ? HEIGHT : startY + CHUNK_SIZE;
+            service.submit(new RaytraceTask(pixels, startY, endY));
         }
+
+//        for (int y = 0; y < HEIGHT; ++y){
+//            for (int x = 0; x < WIDTH; ++x) {
+//                Ray ray = cam_Image.rayToImageLayer(x, y, WIDTH, HEIGHT);
+//
+//                if(y > HEIGHT / 2 && x > WIDTH / 2){
+//
+//                }
+//
+//                VectorF color = getColor(ray, 3);
+//                color = gammaCorrectionUp(color, 2.2f);
+//                color = color.multiplyScalar(255);
+//                pixels[y * WIDTH + x] = (0xFF << 24) | ((int)color.x << 16) | ((int)color.y << 8) | (int) color.z;
+//            }
+//        }
 
         service.shutdown();
         while (!service.isTerminated())
@@ -150,7 +174,7 @@ public class Raytracer {
             List<IntersectionPoint> tmpPoints = objects.get(i).intersects(ray);
             IntersectionPoint tmp = null;
             if(!tmpPoints.isEmpty()) tmp = tmpPoints.get(0);
-            if(tmp != null && tmp.intersection != null && tmp.intersection < min){
+            if(tmp != null && tmp.intersection != null && tmp.intersection < min && tmp.intersection > 0){
                 min = tmp.intersection;
                 index = i;
                 intersectionPoint = tmp;
@@ -159,23 +183,27 @@ public class Raytracer {
         if(intersectionPoint == null) {
             return new VectorF(0.05f,0.05f,0.05f);
         }
+
         VectorF point = ray.pointOnRay(intersectionPoint.intersection);
         VectorF normalVec = intersectionPoint.figure.getNormal(point, objects.get(index), intersectionPoint.figure);
 
+        VectorF reflectColor = new VectorF(0,0,0);
+        VectorF refractColor = new VectorF(0,0,0);
 
-        if(!isInShadow(point, normalVec)){
-            color = color.add(intersectionPoint.figure.material.albedo).multiplyScalar(1 - intersectionPoint.figure.material.reflectivity);
+        VectorF objColor = light.physicallyBasedLighting(point, objects.get(index), intersectionPoint.figure, ray.direction, intersectionPoint.figure.material.albedo);
+        if(isInShadow(point, normalVec)){
+            objColor = objColor.multiplyScalar(0.1f);
         }
         if(intersectionPoint.figure.material.reflectivity > 0){
-            color = color.add(getColor(getReflectionRay(ray, point, normalVec), depth - 1)).multiplyScalar(intersectionPoint.figure.material.reflectivity);
+            reflectColor = getColor(getReflectionRay(ray, point, normalVec), depth - 1);
         }
         if(intersectionPoint.figure.material.transmission > 0){
-            color = color.multiplyScalar(1 - intersectionPoint.figure.material.transmission).add(getColor(getRefractionRay(ray, point, normalVec), depth - 1).multiplyScalar(intersectionPoint.figure.material.transmission));
+            refractColor = getColor(getRefractionRay(ray, point, normalVec, intersectionPoint.figure.material.substance), depth - 1);
         }
 
-        color = light.physicallyBasedLighting(point, objects.get(index), intersectionPoint.figure, ray.origin, color);
+        color = objColor.multiplyScalar(1 - intersectionPoint.figure.material.reflectivity).add(reflectColor.multiplyScalar(intersectionPoint.figure.material.reflectivity));
+        color = color.multiplyScalar(1 - intersectionPoint.figure.material.transmission).add(refractColor.multiplyScalar(intersectionPoint.figure.material.transmission));
 
-        color = light.physicallyBasedLighting(point, objects.get(index), intersectionPoint.figure, ray.origin, color);
 
         color.x = Math.max(Math.min(color.x, 1), 0);
         color.y = Math.max(Math.min(color.y, 1), 0);
@@ -185,29 +213,35 @@ public class Raytracer {
 
 
     private Ray getReflectionRay(Ray ray, VectorF newOrigin, VectorF normal){
-        VectorF newDirection = ray.direction.add(normal.multiplyScalar(-2 * normal.dot(ray.direction)));
-        return  new Ray(newOrigin.add(normal.multiplyScalar(0.001f)), newDirection.negate());
+        float nDotV = normal.dot(ray.direction);
+        VectorF newDirection = ray.direction.add(normal.multiplyScalar(-2 * nDotV));
+        return  new Ray(newOrigin.add(normal.multiplyScalar(0.001f)), newDirection);
     }
 
-    private Ray getRefractionRay(Ray ray, VectorF newOrigin, VectorF normal){
+    private Ray getRefractionRay(Ray ray, VectorF newOrigin, VectorF normal, Material.SUBSTANCE substance){
         float i;
         if(ray.direction.dot(normal) < 0){
-            i = 
+            i = Material.SUBSTANCE.AIR.getVal() / substance.getVal();
+        }else {
+            normal = normal.negate();
+            i = substance.getVal() / Material.SUBSTANCE.AIR.getVal();
         }
+        float a = ray.direction.negate().dot(normal);
+        float b = (float) Math.sqrt(1 - i * i * (1 - a * a));
+        VectorF newDirection = ray.direction.multiplyScalar(i).add(normal.multiplyScalar(i * a - b));
+        return new Ray(newOrigin.add(normal.negate().multiplyScalar(0.001f)), newDirection);
     }
 
     private boolean isInShadow(VectorF point, VectorF normal){
-        Ray toLight = new Ray(point.add(normal.multiplyScalar(0.001f)), this.light.pos.add(point.negate()));
+        Ray toLight = new Ray(point.add(normal.multiplyScalar(0.005f)), this.light.pos.add(point.negate()));
         for (int i = 0; i < objects.size(); i++) {
             List<IntersectionPoint> tmpPoints = objects.get(i).intersects(toLight);
             if(!tmpPoints.isEmpty()){
-                boolean isRayIntersected = false;
                 for (int j = 0; j < tmpPoints.size(); j++) {
                     if(tmpPoints.get(j).intersection > 0){
-                        isRayIntersected = true;
+                        return true;
                     }
                 }
-                return isRayIntersected;
             }
         }
         return false;
@@ -249,7 +283,11 @@ public class Raytracer {
                 for (int x = 0; x < WIDTH; ++x) {
                     Ray ray = cam_Image.rayToImageLayer(x, y, WIDTH, HEIGHT);
 
-                    VectorF color = getColor(ray, 4);
+                    if(y > HEIGHT / 2 && x > WIDTH / 2){
+
+                    }
+
+                    VectorF color = getColor(ray, 3);
                     color = gammaCorrectionUp(color, 2.2f);
                     color = color.multiplyScalar(255);
                     pixels[y * WIDTH + x] = (0xFF << 24) | ((int)color.x << 16) | ((int)color.y << 8) | (int) color.z;

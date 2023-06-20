@@ -17,8 +17,8 @@ public class Sphere extends  Figure{
     public List<IntersectionPoint> intersects(Ray ray) {
         List<IntersectionPoint> out = new LinkedList<>();
 
-        VectorF d = ray.direction;
-        VectorF o = ray.origin;
+        VectorF d = ray.direction.clone();
+        VectorF o = ray.origin.clone();
         //(x - cx)^2 + (y + cy)^2 + (z + cz)^2 = r^2
         // ax^2 + bx + c = 0
         float a = d.x * d.x + d.y * d.y + d.z * d.z;

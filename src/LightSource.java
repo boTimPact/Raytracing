@@ -18,17 +18,17 @@ public class LightSource {
     // V = Vector vom Schnittpunkt zur Kamera   -> here: point.negate()
     // L = Vector von der Lichtquelle zum Schnittpunkt
     // H = (V+L)/2 (normalisiert)
-    public VectorF physicallyBasedLighting(VectorF point, Figure figure, Figure intersectionFigure, VectorF camera, VectorF albedo){
+    public VectorF physicallyBasedLighting(VectorF point, Figure figure, Figure intersectionFigure, VectorF viewRayDirection, VectorF albedo){
 
-        VectorF lightDirection = point.add(this.pos.negate()).negate().normalize();
+        VectorF lightDirection = this.pos.add(point.negate()).normalize();
         VectorF normal = figure.getNormal(point, figure, intersectionFigure);
-        VectorF view = camera.add(point.negate()).normalize();
+        VectorF view = viewRayDirection.negate().normalize();
 
         VectorF h = view.add(lightDirection).normalize();
 
         if(normal.dot(lightDirection) < 0) return new VectorF(0,0,0);
 
-        float f = fresnel(normal.dot(view.normalize()), intersectionFigure.material.metallness, 0.04f * intersectionFigure.material.reflectivity);
+        float f = fresnel(normal.dot(view.normalize()), intersectionFigure.material.metallness, 0.04f); //* intersectionFigure.material.reflectivity
         float d = normalDistribution(normal.dot(h), intersectionFigure.material.roughness);
         float g = geometry(normal.dot(view.normalize()), normal.dot(lightDirection.normalize()), intersectionFigure.material.roughness);
         //System.out.println("Fresnel: " + f + "\tNormal: " + d + "\tGeometry: " + g);
