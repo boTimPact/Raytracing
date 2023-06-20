@@ -161,17 +161,17 @@ public class Raytracer {
         }
         VectorF point = ray.pointOnRay(intersectionPoint.intersection);
         VectorF normalVec = intersectionPoint.figure.getNormal(point, objects.get(index), intersectionPoint.figure);
-
-
         //if(!isInShadow(point, normalVec)){
-            color = color.add(intersectionPoint.figure.material.albedo).multiplyScalar(1 - intersectionPoint.figure.material.reflectivity);
+        color = color.add(intersectionPoint.figure.material.albedo).multiplyScalar(1 - intersectionPoint.figure.material.reflectivity);
         //}
         if(intersectionPoint.figure.material.reflectivity > 0){
-            color = color.add(getColor(getReflectionRay(ray, intersectionPoint.intersection, normalVec), depth - 1)).multiplyScalar(intersectionPoint.figure.material.reflectivity);
+            color = color.add(getColor(getReflectionRay(ray, point, normalVec), depth - 1)).multiplyScalar(intersectionPoint.figure.material.reflectivity);
         }
         if(intersectionPoint.figure.material.transmission > 0){
-            color = color.add(getColor(ray, 0)); //TODO getColor(refractionRay)
+            color = color.multiplyScalar(1 - intersectionPoint.figure.material.transmission).add(getColor(getRefractionRay(ray, point, normalVec), depth - 1).multiplyScalar(intersectionPoint.figure.material.transmission));
         }
+
+        color = light.physicallyBasedLighting(point, objects.get(index), intersectionPoint.figure, ray.origin, color);
 
         color = light.physicallyBasedLighting(point, objects.get(index), intersectionPoint.figure, ray.origin, color);
 
@@ -182,10 +182,16 @@ public class Raytracer {
     }
 
 
-    private Ray getReflectionRay(Ray ray, float s, VectorF normal){
-        VectorF newOrigin = ray.pointOnRay(s);
+    private Ray getReflectionRay(Ray ray, VectorF newOrigin, VectorF normal){
         VectorF newDirection = ray.direction.add(normal.multiplyScalar(-2 * normal.dot(ray.direction)));
         return  new Ray(newOrigin.add(normal.multiplyScalar(0.001f)), newDirection.negate());
+    }
+
+    private Ray getRefractionRay(Ray ray, VectorF newOrigin, VectorF normal){
+        float i;
+        if(ray.direction.dot(normal) < 0){
+            i = 
+        }
     }
 
     private boolean isInShadow(VectorF point, VectorF normal){
