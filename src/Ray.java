@@ -4,7 +4,7 @@ public class Ray {
 
     public Ray(VectorF origin, VectorF direction){
         this.origin = origin;
-        this.direction = direction;
+        this.direction = direction.normalize();
     }
 
     public Ray(){}
