@@ -30,6 +30,9 @@ public class Raytracer {
     private static final int CHUNK_SIZE = HEIGHT / THREAD_NUMBER;
 
 
+    private double[][] kernel;
+    private static final int kernelSize = 5;
+
     //TODO:
     // Constuctiv solid geometry Verschachtelung,
     // Übung 3:
@@ -92,6 +95,8 @@ public class Raytracer {
 //        ));
 
 
+        calcKernel(1.1);
+
 
         frame = new JFrame();
         image = new MemoryImageSource(WIDTH, HEIGHT, new DirectColorModel(24, 0xff0000, 0xff00, 0xff), new int[WIDTH * HEIGHT], 0, WIDTH);
@@ -152,7 +157,8 @@ public class Raytracer {
 //        }
 
         service.shutdown();
-        while (!service.isTerminated())
+        while (!service.isTerminated());
+        //pixels = applyGauss(pixels);
         image = new MemoryImageSource(WIDTH, HEIGHT, new DirectColorModel(24, 0xff0000, 0xff00, 0xff), pixels, 0, WIDTH);
     }
 
@@ -253,6 +259,77 @@ public class Raytracer {
         light.y = (float) Math.pow(light.y, 1/gamma);
         light.z = (float) Math.pow(light.z, 1/gamma);
         return light;
+    }
+
+    public int[] applyGauss(int[] pixels){
+        int newPixels[] = new int[pixels.length];
+        int offsetKernel = kernelSize / 2;
+
+        for (int y = 0; y < HEIGHT; y++) {
+            for (int x = 0; x < WIDTH; x++) {
+                int pos = y * WIDTH + x;
+
+                double r = 0;
+                double g = 0;
+                double b = 0;
+
+                //KernelLoops
+                for (int k = -(offsetKernel); k <= offsetKernel; k++) {
+                    for (int l = -(offsetKernel); l <= offsetKernel; l++) {
+                        int posFilter = 0;
+                        int argb = 0;
+
+                        //index restriction
+                        int yk = y + k;
+                        int xl = x + l;
+                        if(yk < 0){
+                            yk = 0;
+                        }
+                        if(yk > HEIGHT - 1){
+                            yk = HEIGHT - 1;
+                        }
+                        if(xl < 0){
+                            xl = 0;
+                        }
+                        if(xl > WIDTH - 1){
+                            xl = WIDTH - 1;
+                        }
+
+                        posFilter = yk * WIDTH + xl;
+                        argb = pixels[posFilter];
+
+                        r += ((argb >> 16) & 0xff) * kernel[k + offsetKernel][l + offsetKernel];
+                        g += ((argb >> 8) & 0xff) * kernel[k + offsetKernel][l + offsetKernel];
+                        b += (argb & 0xff) * kernel[k + offsetKernel][l + offsetKernel];
+                    }
+                }
+
+                newPixels[pos] = (0xFF << 24) | ((int) r << 16) | ((int) g << 8) | (int) b;
+            }
+        }
+        return newPixels;
+    }
+
+    private void calcKernel(double sigma){
+        kernel = new double[kernelSize][kernelSize];
+
+        int offsetKernel = kernelSize / 2;
+
+        double sum = 0;
+        for (int k = -(offsetKernel); k <= offsetKernel; k++) {
+            for (int l = -(offsetKernel); l <= offsetKernel; l++) {
+                double d = Math.sqrt(k*k + l*l);
+                double current = Math.exp((-(d * d)) / (2 * sigma * sigma));
+                sum += current;
+                kernel[l + offsetKernel][k + offsetKernel] = current;
+            }
+        }
+
+        for (int k = 0; k < kernelSize; k++) {
+            for (int l = 0; l < kernelSize; l++) {
+                kernel[l][k] /= sum;
+            }
+        }
     }
 
     private void wait(int ms){
