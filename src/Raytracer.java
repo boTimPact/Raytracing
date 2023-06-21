@@ -166,7 +166,7 @@ public class Raytracer {
             }
         }
         if(intersectionPoint == null) {
-            return new VectorF(0.05f,0.05f,0.05f);
+            return new VectorF(0.01f,0.01f,0.01f);
         }
 
         VectorF point = ray.pointOnRay(intersectionPoint.intersection);
