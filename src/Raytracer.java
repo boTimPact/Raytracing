@@ -30,8 +30,8 @@ public class Raytracer {
     private static final int CHUNK_SIZE = HEIGHT / THREAD_NUMBER;
 
 
-    private double[][] kernel;
-    private static final int kernelSize = 5;
+    private double[][] kernel; //= {{(-1/9.), (-1/9.), (-1/9.)} , {(-1/9.), (17/9.), (-1/9.)} , {(-1/9.), (-1/9.), (-1/9.)}}
+    private static final int kernelSize = 3;
 
     //TODO:
     // Constuctiv solid geometry Verschachtelung,
@@ -158,7 +158,7 @@ public class Raytracer {
 
         service.shutdown();
         while (!service.isTerminated());
-        //pixels = applyGauss(pixels);
+        pixels = applyGauss(pixels);
         image = new MemoryImageSource(WIDTH, HEIGHT, new DirectColorModel(24, 0xff0000, 0xff00, 0xff), pixels, 0, WIDTH);
     }
 
