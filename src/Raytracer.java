@@ -4,6 +4,7 @@ import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.image.DirectColorModel;
 import java.awt.image.MemoryImageSource;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.*;
@@ -76,7 +77,6 @@ public class Raytracer {
                     new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0,1,1), 0.5f,0, false, 0, Substance.SOLID)).translate(new VectorF(0.35f,1.5f,0f)))
             );
 
-
             objects.add(new CSG.Differenz(
                 new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0.5f,1,0.5f), 0.8f,0, false, 0, Substance.SOLID)).scale(new VectorF(1.5f,1.5f,1.5f)).translate(new VectorF(-1,2.5f,-0.5f)).translate(new VectorF(8,-5f,-6)),
                 test.translate(new VectorF(8,-5f,-6)))
@@ -98,6 +98,8 @@ public class Raytracer {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
 
+        service = Executors.newFixedThreadPool(THREAD_NUMBER);
+
 
         do{
             long time = System.currentTimeMillis();
@@ -113,7 +115,7 @@ public class Raytracer {
     float delta = 0.03f;
 
     public void update(){
-        service = Executors.newFixedThreadPool(THREAD_NUMBER);
+        List<Future> tasks = new ArrayList<>();
 
         offset += delta;
 //        if(offset > 10 || offset < -10){
@@ -130,11 +132,16 @@ public class Raytracer {
         for (int i = 0; i < THREAD_NUMBER; i++) {
             int startY = i * CHUNK_SIZE;
             int endY = i == THREAD_NUMBER - 1 ? HEIGHT : startY + CHUNK_SIZE;
-            service.submit(new RaytraceTask(pixels, startY, endY));
+            tasks.add(service.submit(new RaytraceTask(pixels, startY, endY)));
         }
-
-        service.shutdown();
-        while (!service.isTerminated())
+        
+        for (Future future:tasks) {
+            try {
+                future.get();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
         image = new MemoryImageSource(WIDTH, HEIGHT, new DirectColorModel(24, 0xff0000, 0xff00, 0xff), pixels, 0, WIDTH);
     }
 
