@@ -28,16 +28,18 @@ public class LightSource {
 
         if(normal.dot(lightDirection) < 0) return new VectorF(0,0,0);
 
-        float f = fresnel(normal.dot(view.normalize()), intersectionFigure.material.metallness, 0.04f); //* intersectionFigure.material.reflectivity
+        VectorF reflectivity = intersectionFigure.material.metallness > 0 ? intersectionFigure.material.albedo : new VectorF(0.04f, 0.04f, 0.04f);
+
+        VectorF f = fresnel(normal.dot(view.normalize()), reflectivity); //* intersectionFigure.material.reflectivity
         float d = normalDistribution(normal.dot(h), intersectionFigure.material.roughness);
         float g = geometry(normal.dot(view.normalize()), normal.dot(lightDirection.normalize()), intersectionFigure.material.roughness);
         //System.out.println("Fresnel: " + f + "\tNormal: " + d + "\tGeometry: " + g);
 
-        float ks = f * d * g;
-        float kd = (1 - ks) * (1 - intersectionFigure.material.metallness);
+        VectorF ks = f.multiplyScalar(d * g);
+        VectorF kd = new VectorF(1,1,1).add(ks.negate()).multiplyScalar(1 - intersectionFigure.material.metallness);
 
         //VectorF light = new VectorF(1,1,1).multiplyScalar(ks);
-        VectorF light = this.color.multiplyScalar(brightness * normal.dot(lightDirection.normalize())).multiplyLineByLine(albedo.multiplyScalar(kd).add(new VectorF(ks,ks,ks)));
+        VectorF light = this.color.multiplyScalar(brightness * normal.dot(lightDirection.normalize())).multiplyLineByLine(albedo.multiplyLineByLine(kd).add(ks));
 
         light.x = Math.max(Math.min(light.x, 1), 0);
         light.y = Math.max(Math.min(light.y, 1), 0);
@@ -51,8 +53,8 @@ public class LightSource {
     float geometry(float ndotv, float ndotl, float roughness){
         return ndotv / (ndotv * (1 - roughness / 2) + roughness / 2) * ndotl / (ndotl * (1 - roughness / 2) + roughness / 2);
     }
-    float fresnel(float ndotv, float metalness, float baseReflectivity){
-        float reflectivity = (float) (baseReflectivity * (1 - metalness));
-        return reflectivity + (1 - reflectivity) * (float) Math.pow((1 - ndotv), 5);
+    VectorF fresnel(float ndotv, VectorF baseReflectivity){
+        //return baseReflectivity + (1 - baseReflectivity) * (float) Math.pow((1 - ndotv), 5);
+        return baseReflectivity.add(new VectorF(1,1,1).add(baseReflectivity.negate())).multiplyScalar((float)Math.pow((1 - ndotv), 5));
     }
 }
