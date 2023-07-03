@@ -9,9 +9,31 @@ Dazu gehören:
 - Grundlegende Kamerafunktion
 - Lichtquellen
 - Materialeigenschaften
-- Mathematische Darstellung von Körpern: Kugeln / Quadriken & Transformationen dieser
+- Mathematische Darstellung von Körpern: Kugeln / Quadriken & Transformationen (Translation, Rotation, Skalierung)
 - Constructive Solid Geometry (Vereinigung, Schnitt, Differenz)
 - Beleuchtungsmodell mit Cook-Torrance
+- Schatten-, Reflektions- & Refraktionsstrahlen
+- Transparenz & Brechungsindex
+- Pathtracing (hier für weiche Schatten)
+
+
+_English version_
+### This project was created as part of the GTAT1 Game Technology & Interactive Systems: Ray Tracing course.
+
+In the practical part of the course, the material learned had to be implemented.
+This included:
+- Image generation through ray tracing
+- Basic camera function
+- Light sources
+- Material properties
+- Mathematical representation of solids: spheres / quadrics & transformations (translation, rotation, scaling)
+- Constructive Solid Geometry (union, intersection, difference)
+- Illumination model with Cook-Torrance
+- Shadow, reflection & refraction rays
+- Transparency & Refractive Index
+- Pathtracing (here for soft shadows)
+
+
 
 Results:
 1st Iteration
