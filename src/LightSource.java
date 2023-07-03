@@ -1,9 +1,15 @@
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+
 public class LightSource {
 
     VectorF pos;
+    List<VectorF> lightCheckers;
     public VectorF color;
     public float brightness;
     public float gamma;
+    private static final int SHADOWRAYCOUNT = 10;
 
 
     public LightSource(VectorF pos, VectorF color, float brightness, float gamma) {
@@ -11,8 +17,34 @@ public class LightSource {
         this.color = color;
         this.brightness = brightness;
         this.gamma = gamma;
+        lightCheckers = new ArrayList<>();
+        calcLightCheckers();
     }
 
+
+    private void calcLightCheckers(){
+        List<VectorF> lightpositions = new LinkedList<>();
+        lightpositions.add(this.pos);
+        for (int i = 0; i < SHADOWRAYCOUNT; i++) {
+            VectorF vec = randomVec();
+            VectorF newLightPos = this.pos.add(vec);
+            lightpositions.add(newLightPos);
+        }
+    }
+
+    private VectorF randomVec(){
+        return new VectorF(
+                (float) randomNormalDistribution(),
+                (float) randomNormalDistribution(),
+                (float) randomNormalDistribution()
+        ).normalize();
+    }
+
+    private double randomNormalDistribution(){
+        double theta = 2 * Math.PI * Math.random();
+        double rho = Math.sqrt(-2 * Math.log(Math.random()));
+        return rho * Math.cos(theta);
+    }
 
     // N = normalVector,
     // V = Vector vom Schnittpunkt zur Kamera   -> here: point.negate()
@@ -28,7 +60,8 @@ public class LightSource {
 
         if(normal.dot(lightDirection) < 0) return new VectorF(0,0,0);
 
-        VectorF reflectivity = intersectionFigure.material.metallness > 0 ? intersectionFigure.material.albedo : new VectorF(0.04f, 0.04f, 0.04f);
+        VectorF reflectivity = intersectionFigure.material.albedo.multiplyScalar(intersectionFigure.material.metallness).add(new VectorF(0.04f, 0.04f, 0.04f).multiplyScalar(1 - intersectionFigure.material.metallness));
+        //VectorF reflectivity = intersectionFigure.material.metallness > 0 ? intersectionFigure.material.albedo : new VectorF(0.04f,0.04f,0.04f);
 
         VectorF f = fresnel(normal.dot(view.normalize()), reflectivity); //* intersectionFigure.material.reflectivity
         float d = normalDistribution(normal.dot(h), intersectionFigure.material.roughness);
@@ -41,9 +74,7 @@ public class LightSource {
         //VectorF light = new VectorF(1,1,1).multiplyScalar(ks);
         VectorF light = this.color.multiplyScalar(brightness * normal.dot(lightDirection.normalize())).multiplyLineByLine(albedo.multiplyLineByLine(kd).add(ks));
 
-        light.x = Math.max(Math.min(light.x, 1), 0);
-        light.y = Math.max(Math.min(light.y, 1), 0);
-        light.z = Math.max(Math.min(light.z, 1), 0);
+        light = light.clamp(1,0);
         return light;
     }
 

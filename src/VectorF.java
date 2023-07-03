@@ -113,6 +113,13 @@ public class VectorF {
         return out;
     }
 
+    public VectorF clamp(float max, float min){
+        VectorF out = new VectorF(0,0,0);
+        out.x = Math.max(Math.min(this.x, max), min);
+        out.y = Math.max(Math.min(this.y, max), min);
+        out.z = Math.max(Math.min(this.z, max), min);
+        return out;
+    }
     @Override
     public VectorF clone(){
         return new VectorF(this.x, this.y, this.z, this.z);
