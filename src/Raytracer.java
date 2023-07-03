@@ -17,7 +17,7 @@ public class Raytracer {
 
     public Camera_ImageLayer cam_Image;
     List<Figure> objects = new LinkedList<>();
-    LightSource light;
+    List<LightSource> lights;
     JFrame frame;
     JLabel imageLabel;
     MemoryImageSource image;
@@ -27,6 +27,7 @@ public class Raytracer {
 
     private static final int WIDTH = 1920;
     private static final int HEIGHT = 1080;
+    private static final int RECURSIONDEPTH = 5;
     private static final int THREAD_NUMBER = Runtime.getRuntime().availableProcessors();
     private static final int CHUNK_SIZE = HEIGHT / THREAD_NUMBER;
 
@@ -53,11 +54,13 @@ public class Raytracer {
     public void init(){
         pixels = new int[WIDTH * HEIGHT];
         cam_Image = new Camera_ImageLayer(WIDTH, HEIGHT);
-        light = new LightSource(new VectorF(0,-5,15), new VectorF(1,1,1), 1f, 2.2f);
+        lights = new LinkedList<>();
+        lights.add(new LightSource(new VectorF(0,-5,15), new VectorF(1,1,1), 1f, 2.2f));
+        lights.add(new LightSource(new VectorF(5,10,10), new VectorF(1,1,1), 1f,2.2f));
 
         //region Object Init Region
             this.objects.add(new Sphere(new Material(new VectorF(0,0,1), 0.3f, 0, false, 0, Substance.SOLID), new VectorF(-3,0,-5), 2));
-            this.objects.add(new Sphere(new Material(new VectorF(1,1,1), 0.08f, 0, true, 0, Substance.SOLID), new VectorF(3,0,-5), 2));
+            this.objects.add(new Sphere(new Material(new VectorF(1,1,1), 0.04f, 0, true, 0, Substance.SOLID), new VectorF(3,0,-5), 2));
             this.objects.add(new Sphere(new Material(new VectorF(1,1,1), 0, 0, false, 0.99f, Substance.GLASS), new VectorF(-1,-1,0), 1));
 
             this.objects.add(new Sphere(new Material(new VectorF(1,0.64f,0), 1, 0, false, 0, Substance.SOLID), new VectorF(0,1020,-1000), 980));
@@ -106,7 +109,7 @@ public class Raytracer {
             update();
             render();
             System.out.println(System.currentTimeMillis() - time + " milliseconds");
-            System.out.println(1000 / (System.currentTimeMillis() - time) + " fps\n");
+            System.out.printf("%.2f fps\n\n", 1000. / (System.currentTimeMillis() - time));
             //wait(0);
         }while (true);
     }
@@ -124,7 +127,7 @@ public class Raytracer {
 //        light.pos.x = -offset;
 //        light.pos.y = offset;
         Matrix4f rotMat = new Matrix4f().rotateY(delta);
-        light.pos = light.pos.multiplyMatrix(rotMat);
+        lights.get(0).pos = lights.get(0).pos.multiplyMatrix(rotMat);
 
 //        Sphere moveing = (Sphere)objects.get(2);
 //        moveing.mid.y = offset;
@@ -134,7 +137,7 @@ public class Raytracer {
             int endY = i == THREAD_NUMBER - 1 ? HEIGHT : startY + CHUNK_SIZE;
             tasks.add(service.submit(new RaytraceTask(pixels, startY, endY)));
         }
-        
+
         for (Future future:tasks) {
             try {
                 future.get();
@@ -179,10 +182,18 @@ public class Raytracer {
         VectorF reflectColor = new VectorF(0,0,0);
         VectorF refractColor = new VectorF(0,0,0);
 
-        VectorF objColor = light.physicallyBasedLighting(point, objects.get(index), intersectionPoint.figure, ray.direction, intersectionPoint.figure.material.albedo);
-        if(isInShadow(point, normalVec)){
-            objColor = objColor.multiplyScalar(0.1f);
+
+        VectorF objColor = new VectorF(0,0,0);
+        for (LightSource light: lights) {
+            VectorF lightColor = light.physicallyBasedLighting(point, objects.get(index), intersectionPoint.figure, ray.direction, intersectionPoint.figure.material.albedo);
+//            if(isInShadow(point, normalVec, light.pos)){
+//                lightColor = lightColor.multiplyScalar(0.1f);
+//            }
+            lightColor = lightColor.multiplyScalar(shadowFactor(point, normalVec, light, 10));
+//            System.out.println(shadowFactor(point, normalVec, light, 10));
+            objColor = objColor.add(lightColor);
         }
+
         if(intersectionPoint.figure.material.reflectivity > 0){
             reflectColor = getColor(getReflectionRay(ray, point, normalVec), depth - 1);
         }
@@ -194,12 +205,9 @@ public class Raytracer {
         color = color.multiplyScalar(1 - intersectionPoint.figure.material.transmission).add(refractColor.multiplyScalar(intersectionPoint.figure.material.transmission));
 
 
-        color.x = Math.max(Math.min(color.x, 1), 0);
-        color.y = Math.max(Math.min(color.y, 1), 0);
-        color.z = Math.max(Math.min(color.z, 1), 0);
+        color = color.clamp(1,0);
         return color;
     }
-
 
     private Ray getReflectionRay(Ray ray, VectorF newOrigin, VectorF normal){
         float nDotV = normal.dot(ray.direction);
@@ -223,8 +231,20 @@ public class Raytracer {
         return new Ray(newOrigin.add(newDirection.multiplyScalar(0.002f)), newDirection);
     }
 
-    private boolean isInShadow(VectorF point, VectorF normal){
-        Ray toLight = new Ray(point.add(normal.multiplyScalar(0.002f)), this.light.pos.add(point.negate()));
+
+    private float shadowFactor(VectorF point, VectorF normal, LightSource light, int shadowRayCount){
+        int count = 0;
+
+        for (VectorF lightpos: light.lightCheckers) {
+            if(isInShadow(point, normal, lightpos)){
+                count++;
+            }
+        }
+        return 1 - (count / (float) shadowRayCount);
+    }
+
+    private boolean isInShadow(VectorF point, VectorF normal, VectorF lightPos){
+        Ray toLight = new Ray(point.add(normal.multiplyScalar(0.002f)), lightPos.add(point.negate()));
         for (int i = 0; i < objects.size(); i++) {
             List<IntersectionPoint> tmpPoints = objects.get(i).intersects(toLight);
             if(!tmpPoints.isEmpty()){
@@ -238,13 +258,13 @@ public class Raytracer {
         return false;
     }
 
-
     private VectorF gammaCorrectionUp(VectorF light, float gamma){
         light.x = (float) Math.pow(light.x, 1/gamma);
         light.y = (float) Math.pow(light.y, 1/gamma);
         light.z = (float) Math.pow(light.z, 1/gamma);
         return light;
     }
+
 
     private void wait(int ms){
         try{
@@ -274,8 +294,7 @@ public class Raytracer {
                 for (int x = 0; x < WIDTH; ++x) {
                     Ray ray = cam_Image.rayToImageLayer(x, y, WIDTH, HEIGHT);
 
-
-                    VectorF color = getColor(ray, 5);
+                    VectorF color = getColor(ray, RECURSIONDEPTH);
                     color = gammaCorrectionUp(color, 2.2f);
                     color = color.multiplyScalar(255);
                     pixels[y * WIDTH + x] = (0xFF << 24) | ((int)color.x << 16) | ((int)color.y << 8) | (int) color.z;
