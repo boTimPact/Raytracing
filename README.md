@@ -1,6 +1,8 @@
 # Raytracing
 _English version below_
 
+
+
 ### Dieses Projekt ist im Zuge des Kurses GTAT1 Game Technology & Interactive Systems: Ray Tracing entstanden
 
 Im Praxisteil der Veranstaltung mussten der gelernte Stoff implementiert werden.
@@ -15,6 +17,9 @@ Dazu gehören:
 - Schatten-, Reflektions- & Refraktionsstrahlen
 - Transparenz & Brechungsindex
 - Pathtracing (hier für weiche Schatten)
+
+
+
 
 
 _English version_
