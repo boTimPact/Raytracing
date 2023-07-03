@@ -4,6 +4,7 @@ import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.image.DirectColorModel;
 import java.awt.image.MemoryImageSource;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.*;
@@ -32,14 +33,12 @@ public class Raytracer {
 
     //TODO:
     // Constuctiv solid geometry Verschachtelung,
-    // Übung 3:
-    // Schatten, (optional: mehrere Schatten, weiche Schatten),
+    // weiche Schatten,
     // Lichtkegel,
-    // Reflexion (Strahl weiterleiten)
-    // Refraktion
+    // Metallness,
     // Optional:
-    // Multithreaded & (UI) & Weichzeichner (Filter),
-
+    // (UI)
+    // &&
     // Übung 4 (Nicht alle nötig)
     // Dreicksnetz Figuren
     // Objekte einlesen (siehe Computergrafik)
@@ -47,51 +46,49 @@ public class Raytracer {
     // Nebel
     // Andere Körper
     // Bounding Volume Hierarchy (BVA)
-    //
 
 
-    Quadric test = new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(1,1,0), 0.9f,0, true, 0, Material.SUBSTANCE.SOLID)).scale(new VectorF(1.2f,1.2f,1.2f)).translate(new VectorF(-1f,2.3f,0f));
+    Quadric test = new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(1,1,0), 0.9f,0, true, 0, Substance.SOLID)).scale(new VectorF(1.2f,1.2f,1.2f)).translate(new VectorF(-1f,2.3f,0f));
 
     public void init(){
         pixels = new int[WIDTH * HEIGHT];
         cam_Image = new Camera_ImageLayer(WIDTH, HEIGHT);
         light = new LightSource(new VectorF(0,-5,15), new VectorF(1,1,1), 1f, 2.2f);
 
+        //region Object Init Region
+            this.objects.add(new Sphere(new Material(new VectorF(0,0,1), 0.3f, 0, false, 0, Substance.SOLID), new VectorF(-3,0,-5), 2));
+            this.objects.add(new Sphere(new Material(new VectorF(1,1,1), 0.08f, 0, true, 0, Substance.SOLID), new VectorF(3,0,-5), 2));
+            this.objects.add(new Sphere(new Material(new VectorF(1,1,1), 0, 0, false, 0.99f, Substance.GLASS), new VectorF(-1,-1,0), 1));
 
-        this.objects.add(new Sphere(new Material(new VectorF(0,0,1), 0.3f, 0, false, 0, Material.SUBSTANCE.SOLID), new VectorF(-3,0,-5), 2));
-        this.objects.add(new Sphere(new Material(new VectorF(1,1,1), 0.08f, 0, true, 0, Material.SUBSTANCE.SOLID), new VectorF(3,0,-5), 2));
-//        this.objects.add(new Sphere(new Material(new VectorF(1,1,1), 0, 0, false, 1f, Material.SUBSTANCE.GLASS), new VectorF(-2,0,-1), 2));
-
-        this.objects.add(new Sphere(new Material(new VectorF(1,1,0), 1, 0, false, 0, Material.SUBSTANCE.SOLID), new VectorF(0,1020,-1000), 980));
-
-
-//        this.objects.add(new Quadric(0,0,0,0,0,0,0,1,0,-4, new Material(new VectorF(1,0,0),1,0)).translate(new VectorF(0,8,0)));
-
-//        this.objects.add(new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0.6f,0,1), 0.3f,0, true, 0, Material.SUBSTANCE.GLASS)).scale(new VectorF(2,2,2)).translate(new VectorF(5,0,-10)));
-//
-        objects.add(new CSG.Union(
-                new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(1,0,0), 0.2f,0, false, 0, Material.SUBSTANCE.SOLID)).scale(new VectorF(1.5f, 1.5f, 1.5f)).translate(new VectorF(0,-2,-3-3)),
-                new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0,0,1), 0.9f,0, true, 0, Material.SUBSTANCE.SOLID)).translate(new VectorF(0.5f,-2,-2.5f-3)))
-        );
-//
-        objects.add(new CSG.Intersection(
-                new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(1,1,0), 0.2f,0, false, 0, Material.SUBSTANCE.SOLID)).translate(new VectorF(-0.35f,1.5f,-0.3f)),
-                new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0,1,1), 0.5f,0, false, 0, Material.SUBSTANCE.SOLID)).translate(new VectorF(0.35f,1.5f,0f)))
-        );
-//
-//
-        objects.add(new CSG.Differenz(
-            new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0.5f,1,0.5f), 0.8f,0, false, 0, Material.SUBSTANCE.SOLID)).scale(new VectorF(1.5f,1.5f,1.5f)).translate(new VectorF(-1,2.5f,-0.5f)).translate(new VectorF(8,-5f,-6)),
-            test.translate(new VectorF(8,-5f,-6)))
-        );
-//
-//        objects.add(new Quadric(0,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0,0,1), 0.35f,0, true, 0)).rotate(new VectorF(0,0,1), -75).translate(new VectorF(-5,0,-10)));
-//        objects.add(new CSG.Intersection(
-//                new Quadric(0,0,0,0,0,0,0,-1,0,-8, new Material(new VectorF(1,0,0),1,0)).rotate(new VectorF(1,0,0), 20),
-//                new Quadric(0,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0,0,1), 0.2f,0)).rotate(new VectorF(0,0,1), -75).rotate(new VectorF(1,0,0), 20).translate(new VectorF(-5,0,-10))
-//        ));
+            this.objects.add(new Sphere(new Material(new VectorF(1,0.64f,0), 1, 0, false, 0, Substance.SOLID), new VectorF(0,1020,-1000), 980));
 
 
+    //        this.objects.add(new Quadric(0,0,0,0,0,0,0,1,0,-4, new Material(new VectorF(1,0,0),1,0)).translate(new VectorF(0,8,0)));
+
+    //        this.objects.add(new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0.6f,0,1), 0.3f,0, true, 0, Material.SUBSTANCE.GLASS)).scale(new VectorF(2,2,2)).translate(new VectorF(5,0,-10)));
+
+            objects.add(new CSG.Union(
+                    new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(1,0,0), 0.2f,0, false, 0, Substance.SOLID)).scale(new VectorF(1.5f, 1.5f, 1.5f)).translate(new VectorF(0,-2,-3-3)),
+                    new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0,0,1), 0.9f,0, true, 0, Substance.SOLID)).translate(new VectorF(0.5f,-2,-2.5f-3)))
+            );
+
+            objects.add(new CSG.Intersection(
+                    new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(1,0.84f,0), 0.2f,0, false, 0, Substance.SOLID)).translate(new VectorF(-0.35f,1.5f,-0.3f)),
+                    new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0,1,1), 0.5f,0, false, 0, Substance.SOLID)).translate(new VectorF(0.35f,1.5f,0f)))
+            );
+
+            objects.add(new CSG.Differenz(
+                new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0.5f,1,0.5f), 0.8f,0, false, 0, Substance.SOLID)).scale(new VectorF(1.5f,1.5f,1.5f)).translate(new VectorF(-1,2.5f,-0.5f)).translate(new VectorF(8,-5f,-6)),
+                test.translate(new VectorF(8,-5f,-6)))
+            );
+
+    //        objects.add(new Quadric(0,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0,0,1), 0.35f,0, true, 0)).rotate(new VectorF(0,0,1), -75).translate(new VectorF(-5,0,-10)));
+    //        objects.add(new CSG.Intersection(
+    //                new Quadric(0,0,0,0,0,0,0,-1,0,-8, new Material(new VectorF(1,0,0),1,0)).rotate(new VectorF(1,0,0), 20),
+    //                new Quadric(0,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0,0,1), 0.2f,0)).rotate(new VectorF(0,0,1), -75).rotate(new VectorF(1,0,0), 20).translate(new VectorF(-5,0,-10))
+    //        ));
+
+        //endregion R
 
         frame = new JFrame();
         image = new MemoryImageSource(WIDTH, HEIGHT, new DirectColorModel(24, 0xff0000, 0xff00, 0xff), new int[WIDTH * HEIGHT], 0, WIDTH);
@@ -100,6 +97,9 @@ public class Raytracer {
         frame.pack();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
+
+        service = Executors.newFixedThreadPool(THREAD_NUMBER);
+
 
         do{
             long time = System.currentTimeMillis();
@@ -115,8 +115,7 @@ public class Raytracer {
     float delta = 0.03f;
 
     public void update(){
-
-        service = Executors.newFixedThreadPool(THREAD_NUMBER);
+        List<Future> tasks = new ArrayList<>();
 
         offset += delta;
 //        if(offset > 10 || offset < -10){
@@ -133,26 +132,16 @@ public class Raytracer {
         for (int i = 0; i < THREAD_NUMBER; i++) {
             int startY = i * CHUNK_SIZE;
             int endY = i == THREAD_NUMBER - 1 ? HEIGHT : startY + CHUNK_SIZE;
-            service.submit(new RaytraceTask(pixels, startY, endY));
+            tasks.add(service.submit(new RaytraceTask(pixels, startY, endY)));
         }
-
-//        for (int y = 0; y < HEIGHT; ++y){
-//            for (int x = 0; x < WIDTH; ++x) {
-//                Ray ray = cam_Image.rayToImageLayer(x, y, WIDTH, HEIGHT);
-//
-//                if(y > HEIGHT / 2 && x > WIDTH / 2){
-//
-//                }
-//
-//                VectorF color = getColor(ray, 3);
-//                color = gammaCorrectionUp(color, 2.2f);
-//                color = color.multiplyScalar(255);
-//                pixels[y * WIDTH + x] = (0xFF << 24) | ((int)color.x << 16) | ((int)color.y << 8) | (int) color.z;
-//            }
-//        }
-
-        service.shutdown();
-        while (!service.isTerminated())
+        
+        for (Future future:tasks) {
+            try {
+                future.get();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
         image = new MemoryImageSource(WIDTH, HEIGHT, new DirectColorModel(24, 0xff0000, 0xff00, 0xff), pixels, 0, WIDTH);
     }
 
@@ -181,7 +170,7 @@ public class Raytracer {
             }
         }
         if(intersectionPoint == null) {
-            return new VectorF(0.05f,0.05f,0.05f);
+            return new VectorF(0.01f,0.01f,0.01f);
         }
 
         VectorF point = ray.pointOnRay(intersectionPoint.intersection);
@@ -215,30 +204,32 @@ public class Raytracer {
     private Ray getReflectionRay(Ray ray, VectorF newOrigin, VectorF normal){
         float nDotV = normal.dot(ray.direction);
         VectorF newDirection = ray.direction.add(normal.multiplyScalar(-2 * nDotV));
-        return  new Ray(newOrigin.add(normal.multiplyScalar(0.001f)), newDirection);
+        return  new Ray(newOrigin.add(normal.multiplyScalar(0.002f)), newDirection);
     }
 
-    private Ray getRefractionRay(Ray ray, VectorF newOrigin, VectorF normal, Material.SUBSTANCE substance){
+    private Ray getRefractionRay(Ray ray, VectorF newOrigin, VectorF normal, Substance substance){
         float i;
         if(ray.direction.dot(normal) < 0){
-            i = Material.SUBSTANCE.AIR.getVal() / substance.getVal();
+            i = Substance.AIR.getVal() / substance.getVal();
         }else {
             normal = normal.negate();
-            i = substance.getVal() / Material.SUBSTANCE.AIR.getVal();
+            i = substance.getVal() / Substance.AIR.getVal();
         }
         float a = ray.direction.negate().dot(normal);
-        float b = (float) Math.sqrt(1 - i * i * (1 - a * a));
+        float tmp = 1 - i * i * (1 - a * a);
+        if(tmp < 0) return getReflectionRay(ray, newOrigin, normal);
+        float b = (float) Math.sqrt(tmp);
         VectorF newDirection = ray.direction.multiplyScalar(i).add(normal.multiplyScalar(i * a - b));
-        return new Ray(newOrigin.add(normal.negate().multiplyScalar(0.001f)), newDirection);
+        return new Ray(newOrigin.add(newDirection.multiplyScalar(0.002f)), newDirection);
     }
 
     private boolean isInShadow(VectorF point, VectorF normal){
-        Ray toLight = new Ray(point.add(normal.multiplyScalar(0.005f)), this.light.pos.add(point.negate()));
+        Ray toLight = new Ray(point.add(normal.multiplyScalar(0.002f)), this.light.pos.add(point.negate()));
         for (int i = 0; i < objects.size(); i++) {
             List<IntersectionPoint> tmpPoints = objects.get(i).intersects(toLight);
             if(!tmpPoints.isEmpty()){
                 for (int j = 0; j < tmpPoints.size(); j++) {
-                    if(tmpPoints.get(j).intersection > 0){
+                    if(tmpPoints.get(j).intersection > 0 && toLight.direction.magnitude() < tmpPoints.get(j).intersection && tmpPoints.get(j).figure.material.substance == Substance.SOLID){
                         return true;
                     }
                 }
@@ -283,11 +274,8 @@ public class Raytracer {
                 for (int x = 0; x < WIDTH; ++x) {
                     Ray ray = cam_Image.rayToImageLayer(x, y, WIDTH, HEIGHT);
 
-                    if(y > HEIGHT / 2 && x > WIDTH / 2){
 
-                    }
-
-                    VectorF color = getColor(ray, 3);
+                    VectorF color = getColor(ray, 5);
                     color = gammaCorrectionUp(color, 2.2f);
                     color = color.multiplyScalar(255);
                     pixels[y * WIDTH + x] = (0xFF << 24) | ((int)color.x << 16) | ((int)color.y << 8) | (int) color.z;

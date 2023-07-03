@@ -5,9 +5,9 @@ public class Material {
     float metallness;
     float reflectivity;
     float transmission;
-    SUBSTANCE substance;
+    Substance substance;
 
-    public Material(VectorF albedo, float roughness, float metallness, boolean isReflective, float transmission, SUBSTANCE substance) {
+    public Material(VectorF albedo, float roughness, float metallness, boolean isReflective, float transmission, Substance substance) {
         this.albedo = albedo;
         this.albedo = gammaCorrectionDown(albedo, GAMMA);
         this.roughness = roughness;
@@ -23,23 +23,5 @@ public class Material {
         light.y = (float) Math.pow(light.y, gamma);
         light.z = (float) Math.pow(light.z, gamma);
         return light;
-    }
-
-    public enum SUBSTANCE {
-        GLASS(1.5f),
-        WATER(1.3f),
-        DIAMOND(1.8f),
-        AIR(1),
-        SOLID(0);
-
-        private float value;
-
-        SUBSTANCE(float value) {
-            this.value = value;
-        }
-
-        public float getVal() {
-            return value;
-        }
     }
 }
