@@ -1,8 +1,6 @@
 # Raytracing
 _English version below_
 
-
-
 ### Dieses Projekt ist im Zuge des Kurses GTAT1 Game Technology & Interactive Systems: Ray Tracing entstanden
 
 Im Praxisteil der Veranstaltung mussten der gelernte Stoff implementiert werden.
@@ -17,10 +15,6 @@ Dazu gehören:
 - Schatten-, Reflektions- & Refraktionsstrahlen
 - Transparenz & Brechungsindex
 - Pathtracing (hier für weiche Schatten)
-
-
-
-
 
 _English version_
 ### This project was created as part of the GTAT1 Game Technology & Interactive Systems: Ray Tracing course.
@@ -38,15 +32,12 @@ This included:
 - Transparency & Refractive Index
 - Pathtracing (here for soft shadows)
 
-
-
 Results:
 1st Iteration
 <picture>
   <source srcset="https://github.com/boTimPact/Raytracing/blob/master/Pictures/Raytracing_Ue1.png?raw=true">
   <img alt="Basic Raytracer render showing 3 spheres with diffuse lighting" src="https://github.com/boTimPact/Raytracing/blob/master/Pictures/Raytracing_Ue1.png?raw=true">
 </picture>
-
 
 2nd Iteration
 <picture>
