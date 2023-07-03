@@ -138,7 +138,7 @@ public class Raytracer {
             tasks.add(service.submit(new RaytraceTask(pixels, startY, endY)));
         }
 
-        for (Future future:tasks) {
+        for (Future future : tasks) {
             try {
                 future.get();
             } catch (Exception e) {
