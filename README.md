@@ -16,6 +16,9 @@ Behandelte Themen:
 - Schatten-, Reflektions- & Refraktionsstrahlen
 - Transparenz & Brechungsindex
 - Pathtracing (hier für weiche Schatten)
+<br>
+<br>
+
 
 _English version_
 ## This project was created as part of the GTAT1 Game Technology & Interactive Systems: Ray Tracing course.
