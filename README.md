@@ -3,8 +3,8 @@ _English version below_
 
 ## Dieses Projekt ist im Zuge des Kurses GTAT1 Game Technology & Interactive Systems: Ray Tracing entstanden
 
-Im Praxisteil der Veranstaltung mussten der gelernte Stoff implementiert werden.
-Dazu gehören:
+Im Praxisteil der Veranstaltung musste der gelernte Stoff in einem eigenen Raytracer implementiert werden.
+Behandelte Themen:
 - Bilderzeugung durch Strahlverfolgung
 - Grundlegende Kamerafunktion
 - Lichtquellen
@@ -19,8 +19,8 @@ Dazu gehören:
 _English version_
 ## This project was created as part of the GTAT1 Game Technology & Interactive Systems: Ray Tracing course.
 
-In the practical part of the course, the material learned had to be implemented.
-This included:
+In the practical part of the course, the material learned had to be implemented in an own ray tracer.
+Covered Topics:
 - Image generation through ray tracing
 - Basic camera function
 - Light sources
