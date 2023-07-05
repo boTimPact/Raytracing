@@ -36,6 +36,8 @@ Covered Topics:
 - Shadow, reflection & refraction rays
 - Transparency & Refractive Index
 - Pathtracing (here for soft shadows)
+<br>
+<br>
 
 ## Results:
 ### 1. Iteration
