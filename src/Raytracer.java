@@ -28,7 +28,7 @@ public class Raytracer {
     private static final int WIDTH = 1920;
     private static final int HEIGHT = 1080;
     private static final int RECURSION_DEPTH = 5;
-    public static int SHADOW_RAY_COUNT = 0;
+    public static int ADDITIONAL_SHADOW_RAY_COUNT = 500;
     private static final int THREAD_NUMBER = Runtime.getRuntime().availableProcessors();
     private static final int CHUNK_SIZE = HEIGHT / THREAD_NUMBER;
 
@@ -239,16 +239,18 @@ public class Raytracer {
                 count++;
             }
         }
-        return SHADOW_RAY_COUNT == 0 ? 1 - count : 1 - 0.1f *  (count / (float) SHADOW_RAY_COUNT);
+        return ADDITIONAL_SHADOW_RAY_COUNT == 0 ? 1 - count : 1 - (count / (float) ADDITIONAL_SHADOW_RAY_COUNT);
     }
 
     private boolean isInShadow(VectorF point, VectorF normal, VectorF lightPos){
         Ray toLight = new Ray(point.add(normal.multiplyScalar(0.002f)), lightPos.add(point.negate()));
+        float lightRayMagnitude = toLight.direction.magnitude();
         for (int i = 0; i < objects.size(); i++) {
             List<IntersectionPoint> tmpPoints = objects.get(i).intersects(toLight);
             if(!tmpPoints.isEmpty()){
+
                 for (int j = 0; j < tmpPoints.size(); j++) {
-                    if(tmpPoints.get(j).intersection > 0 && toLight.direction.magnitude() < tmpPoints.get(j).intersection && tmpPoints.get(j).figure.material.substance == Substance.SOLID){
+                    if(tmpPoints.get(j).intersection > 0 && lightRayMagnitude < tmpPoints.get(j).intersection && tmpPoints.get(j).figure.material.substance == Substance.SOLID){
                         return true;
                     }
                 }

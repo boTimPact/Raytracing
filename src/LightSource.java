@@ -22,7 +22,7 @@ public class LightSource {
 
     private void calcLightCheckers(){
         lightCheckers.add(this.pos);
-        for (int i = 0; i < Raytracer.SHADOW_RAY_COUNT; i++) {
+        for (int i = 0; i < Raytracer.ADDITIONAL_SHADOW_RAY_COUNT; i++) {
             VectorF vec = randomVec();
             VectorF newLightPos = this.pos.add(vec).multiplyScalar(0.5f);
             lightCheckers.add(newLightPos);
