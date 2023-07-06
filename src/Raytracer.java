@@ -27,14 +27,14 @@ public class Raytracer {
 
     private static final int WIDTH = 1920;
     private static final int HEIGHT = 1080;
-    private static final int RECURSIONDEPTH = 5;
+    private static final int RECURSION_DEPTH = 5;
+    public static int SHADOW_RAY_COUNT = 10;
     private static final int THREAD_NUMBER = Runtime.getRuntime().availableProcessors();
     private static final int CHUNK_SIZE = HEIGHT / THREAD_NUMBER;
 
 
     //TODO:
     // Constuctiv solid geometry Verschachtelung,
-    // weiche Schatten,
     // Lichtkegel,
     // Metallness,
     // Optional:
@@ -55,7 +55,7 @@ public class Raytracer {
         pixels = new int[WIDTH * HEIGHT];
         cam_Image = new Camera_ImageLayer(WIDTH, HEIGHT);
         lights = new LinkedList<>();
-        lights.add(new LightSource(new VectorF(0,-5,15), new VectorF(1,1,1), 1f, 2.2f));
+        //lights.add(new LightSource(new VectorF(-15,-5, 0), new VectorF(1,1,1), 1f, 2.2f));
         lights.add(new LightSource(new VectorF(5,10,10), new VectorF(1,1,1), 1f,2.2f));
 
         //region Object Init Region
@@ -127,7 +127,7 @@ public class Raytracer {
 //        light.pos.x = -offset;
 //        light.pos.y = offset;
         Matrix4f rotMat = new Matrix4f().rotateY(delta);
-        lights.get(0).pos = lights.get(0).pos.multiplyMatrix(rotMat);
+        //lights.get(0).pos = lights.get(0).pos.multiplyMatrix(rotMat);
 
 //        Sphere moveing = (Sphere)objects.get(2);
 //        moveing.mid.y = offset;
@@ -189,8 +189,7 @@ public class Raytracer {
 //            if(isInShadow(point, normalVec, light.pos)){
 //                lightColor = lightColor.multiplyScalar(0.1f);
 //            }
-            lightColor = lightColor.multiplyScalar(shadowFactor(point, normalVec, light, 10));
-//            System.out.println(shadowFactor(point, normalVec, light, 10));
+            lightColor = lightColor.multiplyScalar(shadowFactor(point, normalVec, light));
             objColor = objColor.add(lightColor);
         }
 
@@ -232,15 +231,15 @@ public class Raytracer {
     }
 
 
-    private float shadowFactor(VectorF point, VectorF normal, LightSource light, int shadowRayCount){
+    private float shadowFactor(VectorF point, VectorF normal, LightSource light){
         int count = 0;
 
-        for (VectorF lightpos: light.lightCheckers) {
-            if(isInShadow(point, normal, lightpos)){
+        for (VectorF lightPos: light.lightCheckers) {
+            if(isInShadow(point, normal, lightPos)){
                 count++;
             }
         }
-        return 1 - (count / (float) shadowRayCount);
+        return SHADOW_RAY_COUNT == 0 ? 1 : 1 - (count / (float) SHADOW_RAY_COUNT);
     }
 
     private boolean isInShadow(VectorF point, VectorF normal, VectorF lightPos){
@@ -294,7 +293,7 @@ public class Raytracer {
                 for (int x = 0; x < WIDTH; ++x) {
                     Ray ray = cam_Image.rayToImageLayer(x, y, WIDTH, HEIGHT);
 
-                    VectorF color = getColor(ray, RECURSIONDEPTH);
+                    VectorF color = getColor(ray, RECURSION_DEPTH);
                     color = gammaCorrectionUp(color, 2.2f);
                     color = color.multiplyScalar(255);
                     pixels[y * WIDTH + x] = (0xFF << 24) | ((int)color.x << 16) | ((int)color.y << 8) | (int) color.z;

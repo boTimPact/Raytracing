@@ -8,7 +8,6 @@ public class LightSource {
     public VectorF color;
     public float brightness;
     public float gamma;
-    public static int SHADOW_RAY_COUNT = 500;
 
 
     public LightSource(VectorF pos, VectorF color, float brightness, float gamma) {
@@ -23,7 +22,7 @@ public class LightSource {
 
     private void calcLightCheckers(){
         lightCheckers.add(this.pos);
-        for (int i = 0; i < SHADOW_RAY_COUNT; i++) {
+        for (int i = 0; i < Raytracer.SHADOW_RAY_COUNT; i++) {
             VectorF vec = randomVec();
             VectorF newLightPos = this.pos.add(vec).multiplyScalar(0.5f);
             lightCheckers.add(newLightPos);
