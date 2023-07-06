@@ -28,7 +28,7 @@ public class Raytracer {
     private static final int WIDTH = 1920;
     private static final int HEIGHT = 1080;
     private static final int RECURSION_DEPTH = 5;
-    public static int SHADOW_RAY_COUNT = 10;
+    public static int SHADOW_RAY_COUNT = 0;
     private static final int THREAD_NUMBER = Runtime.getRuntime().availableProcessors();
     private static final int CHUNK_SIZE = HEIGHT / THREAD_NUMBER;
 
@@ -55,7 +55,7 @@ public class Raytracer {
         pixels = new int[WIDTH * HEIGHT];
         cam_Image = new Camera_ImageLayer(WIDTH, HEIGHT);
         lights = new LinkedList<>();
-        //lights.add(new LightSource(new VectorF(-15,-5, 0), new VectorF(1,1,1), 1f, 2.2f));
+        lights.add(new LightSource(new VectorF(-15,-5, 0), new VectorF(1,1,1), 1f, 2.2f));
         lights.add(new LightSource(new VectorF(5,10,10), new VectorF(1,1,1), 1f,2.2f));
 
         //region Object Init Region
@@ -127,7 +127,7 @@ public class Raytracer {
 //        light.pos.x = -offset;
 //        light.pos.y = offset;
         Matrix4f rotMat = new Matrix4f().rotateY(delta);
-        //lights.get(0).pos = lights.get(0).pos.multiplyMatrix(rotMat);
+        lights.get(0).pos = lights.get(0).pos.multiplyMatrix(rotMat);
 
 //        Sphere moveing = (Sphere)objects.get(2);
 //        moveing.mid.y = offset;
@@ -239,7 +239,7 @@ public class Raytracer {
                 count++;
             }
         }
-        return SHADOW_RAY_COUNT == 0 ? 1 : 1 - (count / (float) SHADOW_RAY_COUNT);
+        return SHADOW_RAY_COUNT == 0 ? 1 - count : 1 - 0.1f *  (count / (float) SHADOW_RAY_COUNT);
     }
 
     private boolean isInShadow(VectorF point, VectorF normal, VectorF lightPos){
