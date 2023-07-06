@@ -1,15 +1,14 @@
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 public class LightSource {
 
-    VectorF pos;
-    List<VectorF> lightCheckers;
+    public VectorF pos;
+    public List<VectorF> lightCheckers;
     public VectorF color;
     public float brightness;
     public float gamma;
-    private static final int SHADOWRAYCOUNT = 10;
+    public static int SHADOW_RAY_COUNT = 500;
 
 
     public LightSource(VectorF pos, VectorF color, float brightness, float gamma) {
@@ -23,12 +22,11 @@ public class LightSource {
 
 
     private void calcLightCheckers(){
-        List<VectorF> lightpositions = new LinkedList<>();
-        lightpositions.add(this.pos);
-        for (int i = 0; i < SHADOWRAYCOUNT; i++) {
+        lightCheckers.add(this.pos);
+        for (int i = 0; i < SHADOW_RAY_COUNT; i++) {
             VectorF vec = randomVec();
-            VectorF newLightPos = this.pos.add(vec);
-            lightpositions.add(newLightPos);
+            VectorF newLightPos = this.pos.add(vec).multiplyScalar(0.5f);
+            lightCheckers.add(newLightPos);
         }
     }
 
