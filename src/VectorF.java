@@ -82,6 +82,22 @@ public class VectorF {
         return out;
     }
 
+    public VectorF divideComponentwise(VectorF other){
+        VectorF out = new VectorF(0,0,0);
+        out.x = this.x / other.x;
+        out.y = this.y / other.y;
+        out.z = this.z / other.z;
+        return out;
+    }
+
+    public float maxValue(){
+        return Math.max(this.x,Math.max(this.y,this.z));
+    }
+
+    public float minValue(){
+        return Math.min(this.x,Math.min(this.y,this.z));
+    }
+
     //Kreuzprodukt
     public VectorF cross(VectorF other){
         VectorF out = new VectorF(1,1,1);

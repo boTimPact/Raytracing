@@ -28,7 +28,7 @@ public class Raytracer {
     private static final int WIDTH = 1920;
     private static final int HEIGHT = 1080;
     private static final int RECURSION_DEPTH = 5;
-    public static int ADDITIONAL_SHADOW_RAY_COUNT = 500;
+    public static int ADDITIONAL_SHADOW_RAY_COUNT = 0;
     private static final int THREAD_NUMBER = Runtime.getRuntime().availableProcessors();
     private static final int CHUNK_SIZE = HEIGHT / THREAD_NUMBER;
 
@@ -70,20 +70,20 @@ public class Raytracer {
 
     //        this.objects.add(new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0.6f,0,1), 0.3f,0, true, 0, Material.SUBSTANCE.GLASS)).scale(new VectorF(2,2,2)).translate(new VectorF(5,0,-10)));
 
-            objects.add(new CSG.Union(
-                    new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(1,0,0), 0.2f,0, false, 0, Substance.SOLID)).scale(new VectorF(1.5f, 1.5f, 1.5f)).translate(new VectorF(0,-2,-3-3)),
-                    new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0,0,1), 0.9f,0, true, 0, Substance.SOLID)).translate(new VectorF(0.5f,-2,-2.5f-3)))
-            );
+//            objects.add(new CSG.Union(
+//                    new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(1,0,0), 0.2f,0, false, 0, Substance.SOLID)).scale(new VectorF(1.5f, 1.5f, 1.5f)).translate(new VectorF(0,-2,-3-3)),
+//                    new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0,0,1), 0.9f,0, true, 0, Substance.SOLID)).translate(new VectorF(0.5f,-2,-2.5f-3)))
+//            );
 
-            objects.add(new CSG.Intersection(
-                    new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(1,0.84f,0), 0.2f,0, false, 0, Substance.SOLID)).translate(new VectorF(-0.35f,1.5f,-0.3f)),
-                    new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0,1,1), 0.5f,0, false, 0, Substance.SOLID)).translate(new VectorF(0.35f,1.5f,0f)))
-            );
-
-            objects.add(new CSG.Differenz(
-                new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0.5f,1,0.5f), 0.8f,0, false, 0, Substance.SOLID)).scale(new VectorF(1.5f,1.5f,1.5f)).translate(new VectorF(-1,2.5f,-0.5f)).translate(new VectorF(8,-5f,-6)),
-                test.translate(new VectorF(8,-5f,-6)))
-            );
+//            objects.add(new CSG.Intersection(
+//                    new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(1,0.84f,0), 0.2f,0, false, 0, Substance.SOLID)).translate(new VectorF(-0.35f,1.5f,-0.3f)),
+//                    new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0,1,1), 0.5f,0, false, 0, Substance.SOLID)).translate(new VectorF(0.35f,1.5f,0f)))
+//            );
+//
+//            objects.add(new CSG.Differenz(
+//                new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0.5f,1,0.5f), 0.8f,0, false, 0, Substance.SOLID)).scale(new VectorF(1.5f,1.5f,1.5f)).translate(new VectorF(-1,2.5f,-0.5f)).translate(new VectorF(8,-5f,-6)),
+//                test.translate(new VectorF(8,-5f,-6)))
+//            );
 
     //        objects.add(new Quadric(0,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0,0,1), 0.35f,0, true, 0)).rotate(new VectorF(0,0,1), -75).translate(new VectorF(-5,0,-10)));
     //        objects.add(new CSG.Intersection(
@@ -92,6 +92,8 @@ public class Raytracer {
     //        ));
 
         //endregion R
+
+        BVH bvh = new BVH(objects);
 
         frame = new JFrame();
         image = new MemoryImageSource(WIDTH, HEIGHT, new DirectColorModel(24, 0xff0000, 0xff00, 0xff), new int[WIDTH * HEIGHT], 0, WIDTH);

@@ -44,4 +44,8 @@ public class Sphere extends  Figure{
     public VectorF getNormal(VectorF point, Figure figure, Figure intersectionFigure){
         return point.add(this.mid.negate()).normalize();
     }
+
+    public BoundingBox getBoundingBox(){
+        return new BoundingBox(this, null, new float[]{this.mid.x - radius, this.mid.x + radius}, new float[]{this.mid.y - radius, this.mid.y + radius}, new float[]{this.mid.z - radius, this.mid.z + radius});
+    }
 }
