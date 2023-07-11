@@ -19,14 +19,36 @@ public class BoundingBox extends Figure{
 
     @Override
     List<IntersectionPoint> intersects(Ray ray) {
-        float s1 = new VectorF(x[0],y[0],z[0]).add(ray.origin).divideComponentwise(ray.direction).maxValue();
-        float s2 = new VectorF(x[1],y[1],z[1]).add(ray.origin).divideComponentwise(ray.direction).minValue();
-        if(s2 < 0 || s2 < s1 || a == null && b == null){
+        VectorF entry = new VectorF(x[0],y[0],z[0]).add(ray.origin.negate()).divideComponentwise(ray.direction.multiplyScalar(1000));
+        VectorF exit = new VectorF(x[1],y[1],z[1]).add(ray.origin.negate()).divideComponentwise(ray.direction.multiplyScalar(1000));
+
+        float tmp;
+        if(ray.direction.x < 0){
+            tmp = entry.x;
+            entry.x = exit.x;
+            exit.x = tmp;
+        }
+        if(ray.direction.y < 0){
+            tmp = entry.y;
+            entry.y = exit.y;
+            exit.y = tmp;
+        }
+        if(ray.direction.z < 0){
+            tmp = entry.z;
+            entry.z = exit.z;
+            exit.z = tmp;
+        }
+
+        float sEntry = entry.maxValue();
+        float sExit = exit.minValue();
+        if(sExit <= sEntry){
             return new LinkedList<>();
         }
 
-        List<IntersectionPoint> listA = a.intersects(ray).stream().sorted((i1, i2) -> Float.compare(i1.intersection, i2.intersection)).toList();
-        List<IntersectionPoint> listB = b.intersects(ray).stream().sorted((i1, i2) -> Float.compare(i1.intersection, i2.intersection)).toList();
+        List<IntersectionPoint> listA = new ArrayList<>();
+        if(a != null) listA = a.intersects(ray).stream().sorted((i1, i2) -> Float.compare(i1.intersection, i2.intersection)).toList();
+        List<IntersectionPoint> listB = new ArrayList<>();
+        if(b != null) listB = b.intersects(ray).stream().sorted((i1, i2) -> Float.compare(i1.intersection, i2.intersection)).toList();
 
         if(listA.isEmpty() && listB.isEmpty()) return new LinkedList<>();
         if(listA.isEmpty()) return listB;

@@ -47,10 +47,9 @@ public class LightSource {
     // V = Vector vom Schnittpunkt zur Kamera   -> here: point.negate()
     // L = Vector von der Lichtquelle zum Schnittpunkt
     // H = (V+L)/2 (normalisiert)
-    public VectorF physicallyBasedLighting(VectorF point, Figure figure, Figure intersectionFigure, VectorF viewRayDirection, VectorF albedo){
+    public VectorF physicallyBasedLighting(VectorF point, VectorF normal, Figure intersectionFigure, VectorF viewRayDirection, VectorF albedo){
 
         VectorF lightDirection = this.pos.add(point.negate()).normalize();
-        VectorF normal = figure.getNormal(point, figure, intersectionFigure);
         VectorF view = viewRayDirection.negate().normalize();
 
         VectorF h = view.add(lightDirection).normalize();

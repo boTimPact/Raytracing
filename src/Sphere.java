@@ -30,14 +30,20 @@ public class Sphere extends  Figure{
         if(discriminant < 0) return out;
 
         if(a == 0) {
-            out.add(new IntersectionPoint(-c/b, this));
+            float x1 = -c/b;
+            VectorF p1 = ray.pointOnRay(x1);
+            out.add(new IntersectionPoint(x1, p1,this, this.getNormal(p1, this ,this)));
             return out;
         }
 
         //(-b - [Vorzeichen von b] * √(b2 - 4ac))/2
         float k = (float) (-b - Math.signum(b) * Math.sqrt(discriminant)) / 2;
-        out.add(new IntersectionPoint(Math.min(c/k, k/a), this));
-        out.add(new IntersectionPoint(Math.max(c/k, k/a), this));
+        float x1 = Math.min(c/k, k/a);
+        float x2 = Math.max(c/k, k/a);
+        VectorF p1 = ray.pointOnRay(x1);
+        VectorF p2 = ray.pointOnRay(x2);
+        out.add(new IntersectionPoint(x1, p1, this, this.getNormal(p1, this, this)));
+        out.add(new IntersectionPoint(x2, p2, this, this.getNormal(p2, this, this)));
         return out;
     }
 
