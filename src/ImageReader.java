@@ -3,11 +3,11 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
-public class HDRImage {
+public class ImageReader {
     //int[] pixels;
     BufferedImage bufferedImage;
 
-    public HDRImage(String filename) {
+    public ImageReader(String filename) {
         File hdrTexture = new File(filename);
         try {
             bufferedImage = ImageIO.read(hdrTexture);

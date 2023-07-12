@@ -14,6 +14,11 @@ public class BVH {
             }else if (f instanceof CSG){
                 CSG s = (CSG) f;
                 boundingBoxes.add(s.getBoundingBox());
+            }else if(f instanceof Triangle){
+                Triangle s = (Triangle) f;
+                boundingBoxes.add(s.getBoundingBox());
+            }else if(f instanceof BoundingBox){
+                boundingBoxes.add((BoundingBox) f);
             }
         }
         root = calcBVH(boundingBoxes);

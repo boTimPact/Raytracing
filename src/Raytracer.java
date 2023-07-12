@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.*;
+import java.util.stream.Collectors;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -18,7 +19,7 @@ public class Raytracer {
     public Camera_ImageLayer cam_Image;
     List<Figure> objects = new LinkedList<>();
     BVH bvh;
-    HDRImage skyDome;
+    ImageReader skyDome;
     List<LightSource> lights;
     JFrame frame;
     JLabel imageLabel;
@@ -101,10 +102,14 @@ public class Raytracer {
     //        ));
 
         //endregion R
+        OBJFileReader reader = new OBJFileReader();
+        List<Figure> triangles = reader.readFile("src/Assets/Models/Pawn_LowPoly.obj", new Material(new VectorF(1,1,1), 0.4f,0, false, 0, Substance.SOLID), new Matrix4f().translate(-17,-3,-150).rotateY(45).rotateX(-20).rotateZ(180));
+        BVH mesh = new BVH(triangles);
+        this.objects.add(mesh.root);
 
         bvh = new BVH(objects);
-        skyDome = new HDRImage("src/Skysphere/kloppenheim_06_puresky_1k.png");
-
+        skyDome = new ImageReader("src/Assets/Skysphere/kloppenheim_06_puresky_1k.png");
+        System.out.println("Setup complete!\nObjects: " + this.objects.size());
         frame = new JFrame();
         image = new MemoryImageSource(WIDTH, HEIGHT, new DirectColorModel(24, 0xff0000, 0xff00, 0xff), new int[WIDTH * HEIGHT], 0, WIDTH);
         imageLabel = new JLabel(new ImageIcon(Toolkit.getDefaultToolkit().createImage(image)));
@@ -175,7 +180,7 @@ public class Raytracer {
         float min = Float.POSITIVE_INFINITY;
 
         for (int i = 0; i < objects.size(); i++) {
-            List<IntersectionPoint> tmpPoints = objects.get(i).intersects(ray); //bvh.root.intersects(ray); //
+            List<IntersectionPoint> tmpPoints = objects.get(i).intersects(ray).stream().sorted((i1, i2) -> Float.compare(i1.intersection, i2.intersection)).toList(); //bvh.root.intersects(ray).stream().sorted((i1, i2) -> Float.compare(i1.intersection, i2.intersection)).toList(); //
             IntersectionPoint tmp = null;
             if (!tmpPoints.isEmpty()) tmp = tmpPoints.get(0);
             if (tmp != null && tmp.intersection != null && tmp.intersection < min && tmp.intersection > 0) {
@@ -186,8 +191,8 @@ public class Raytracer {
         }
 
         if(intersectionPoint == null) {
-            //return new VectorF(0.01f,0.01f,0.01f);
-            return skyDome.getColorAtPoint(ray);
+//            return new VectorF(0.01f,0.01f,0.01f);
+            return skyDome.getColorAtPoint(ray).multiplyScalar(0.5f);
         }
 
         VectorF point = intersectionPoint.point;
