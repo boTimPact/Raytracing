@@ -18,6 +18,7 @@ public class Raytracer {
     public Camera_ImageLayer cam_Image;
     List<Figure> objects = new LinkedList<>();
     BVH bvh;
+    HDRImage skyDome;
     List<LightSource> lights;
     JFrame frame;
     JLabel imageLabel;
@@ -57,10 +58,10 @@ public class Raytracer {
         cam_Image = new Camera_ImageLayer(WIDTH, HEIGHT);
         lights = new LinkedList<>();
         lights.add(new LightSource(new VectorF(-15,-5, 0), new VectorF(1,1,1), 1f, 2.2f));
-        lights.add(new LightSource(new VectorF(5,10,10), new VectorF(1,1,1), 1f,2.2f));
+        //lights.add(new LightSource(new VectorF(5,10,10), new VectorF(1,1,1), 1f,2.2f));
 
         //region Object Init Region
-//        this.objects.add(new Sphere(new Material(new VectorF(0,0,1), 0.3f, 0, false, 0, Substance.SOLID), new VectorF(-3,0,-800), 2));
+//        this.objects.add(new Sphere(new Material(new VectorF(0,0,1), 0.3f, 0, false, 0, Substance.SOLID), new VectorF(0,0,-2), 1));
             this.objects.add(new Sphere(new Material(new VectorF(0,0,1), 0.3f, 0, false, 0, Substance.SOLID), new VectorF(-3,0,-5), 2));
             this.objects.add(new Sphere(new Material(new VectorF(1,1,1), 0.04f, 0, true, 0, Substance.SOLID), new VectorF(3,0,-5), 2));
             this.objects.add(new Sphere(new Material(new VectorF(1,1,1), 0, 0, false, 0.99f, Substance.GLASS), new VectorF(-1,-1,0), 1));
@@ -96,6 +97,7 @@ public class Raytracer {
         //endregion R
 
         bvh = new BVH(objects);
+        skyDome = new HDRImage("src/Skysphere/kloppenheim_06_puresky_1k.png");
 
         frame = new JFrame();
         image = new MemoryImageSource(WIDTH, HEIGHT, new DirectColorModel(24, 0xff0000, 0xff00, 0xff), new int[WIDTH * HEIGHT], 0, WIDTH);
@@ -166,17 +168,20 @@ public class Raytracer {
         IntersectionPoint intersectionPoint = null;
         float min = Float.POSITIVE_INFINITY;
 
-        List<IntersectionPoint> tmpPoints = bvh.root.intersects(ray);
-        IntersectionPoint tmp = null;
-        if(!tmpPoints.isEmpty()) tmp = tmpPoints.get(0);
-        if(tmp != null && tmp.intersection != null && tmp.intersection < min && tmp.intersection > 0){
-            min = tmp.intersection;
+        for (int i = 0; i < objects.size(); i++) {
+            List<IntersectionPoint> tmpPoints = objects.get(i).intersects(ray); //bvh.root.intersects(ray); //
+            IntersectionPoint tmp = null;
+            if (!tmpPoints.isEmpty()) tmp = tmpPoints.get(0);
+            if (tmp != null && tmp.intersection != null && tmp.intersection < min && tmp.intersection > 0) {
+                min = tmp.intersection;
 
-            intersectionPoint = tmp;
+                intersectionPoint = tmp;
+            }
         }
 
         if(intersectionPoint == null) {
-            return new VectorF(0.01f,0.01f,0.01f);
+            //return new VectorF(0.01f,0.01f,0.01f);
+            return skyDome.getColorAtPoint(ray);
         }
 
         VectorF point = intersectionPoint.point;

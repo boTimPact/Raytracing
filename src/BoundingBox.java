@@ -19,30 +19,31 @@ public class BoundingBox extends Figure{
 
     @Override
     List<IntersectionPoint> intersects(Ray ray) {
-        VectorF entry = new VectorF(x[0],y[0],z[0]).add(ray.origin.negate()).divideComponentwise(ray.direction.multiplyScalar(1000));
-        VectorF exit = new VectorF(x[1],y[1],z[1]).add(ray.origin.negate()).divideComponentwise(ray.direction.multiplyScalar(1000));
 
-        float tmp;
-        if(ray.direction.x < 0){
-            tmp = entry.x;
-            entry.x = exit.x;
-            exit.x = tmp;
-        }
-        if(ray.direction.y < 0){
-            tmp = entry.y;
-            entry.y = exit.y;
-            exit.y = tmp;
-        }
-        if(ray.direction.z < 0){
-            tmp = entry.z;
-            entry.z = exit.z;
-            exit.z = tmp;
-        }
+        if(!(ray.origin.x > x[0] && ray.origin.x < x[1] && ray.origin.y > y[0] && ray.origin.y < y[1] && ray.origin.z > z[0] && ray.origin.z < z[1])) {
+             int[] sign = new int[]{ray.direction.x < 0 ? 1 : 0, ray.direction.y < 0 ? 1 : 0, ray.direction.z < 0 ? 1 : 0};
 
-        float sEntry = entry.maxValue();
-        float sExit = exit.minValue();
-        if(sExit <= sEntry){
-            return new LinkedList<>();
+            float tmin, tmax, tymin, tymax, tzmin, tzmax;
+            VectorF invDirection = ray.direction.componentReciprocal();
+
+            tmin = (x[sign[0]] - ray.origin.x) * invDirection.x;
+            tmax = (x[1-sign[0]] - ray.origin.x) * invDirection.x;
+            tymin = (y[sign[1]] - ray.origin.y) * invDirection.y;
+            tymax = (y[1-sign[1]] - ray.origin.y) * invDirection.y;
+
+            if ((tmin > tymax) || (tymin > tmax))
+                return new ArrayList<>();
+
+            if (tymin > tmin)
+                tmin = tymin;
+            if (tymax < tmax)
+                tmax = tymax;
+
+            tzmin = (z[sign[2]] - ray.origin.z) * invDirection.z;
+            tzmax = (z[1-sign[2]] - ray.origin.z) * invDirection.z;
+
+            if ((tmin > tzmax) || (tzmin > tmax))
+                return new ArrayList<>();
         }
 
         List<IntersectionPoint> listA = new ArrayList<>();

@@ -82,11 +82,11 @@ public class VectorF {
         return out;
     }
 
-    public VectorF divideComponentwise(VectorF other){
+    public VectorF componentReciprocal(){
         VectorF out = new VectorF(0,0,0);
-        out.x = this.x / other.x;
-        out.y = this.y / other.y;
-        out.z = this.z / other.z;
+        out.x = 1 / this.x;
+        out.y = 1 / this.y;
+        out.z = 1 / this.z;
         return out;
     }
 
