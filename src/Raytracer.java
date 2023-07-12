@@ -58,7 +58,13 @@ public class Raytracer {
         cam_Image = new Camera_ImageLayer(WIDTH, HEIGHT);
         lights = new LinkedList<>();
         lights.add(new LightSource(new VectorF(-15,-5, 0), new VectorF(1,1,1), 1f, 2.2f));
-        //lights.add(new LightSource(new VectorF(5,10,10), new VectorF(1,1,1), 1f,2.2f));
+
+        //Daylight
+        lights.add(new LightSource(new VectorF(0,100,-1000), new VectorF(1,1,1), 0.1f,2.2f));
+        lights.add(new LightSource(new VectorF(0,100,1000), new VectorF(1,1,1), 0.1f,2.2f));
+        lights.add(new LightSource(new VectorF(1000,100,0), new VectorF(1,1,1), 0.1f,2.2f));
+        lights.add(new LightSource(new VectorF(-1000,100,0), new VectorF(1,1,1), 0.1f,2.2f));
+        lights.add(new LightSource(new VectorF(0,-1000,0), new VectorF(1,1,1), 0.1f,2.2f));
 
         //region Object Init Region
 //        this.objects.add(new Sphere(new Material(new VectorF(0,0,1), 0.3f, 0, false, 0, Substance.SOLID), new VectorF(0,0,-2), 1));

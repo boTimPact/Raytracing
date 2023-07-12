@@ -1,5 +1,3 @@
-import javafx.css.CssParser;
-
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
