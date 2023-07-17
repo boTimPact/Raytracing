@@ -66,6 +66,6 @@ Shadows, reflections, transparency and refractions
 </picture>
 
 ### 4. Iteration
-Path tracing for soft shadows, ++
-
-_Work in Progress_
+Path tracing for soft shadows, Triangle mesh, Skyspheres
+![Raytracing](https://github.com/boTimPact/Raytracing/assets/119596476/a0947635-6d28-45c7-9d00-b5943870d9dc)
+![Raytracing2](https://github.com/boTimPact/Raytracing/assets/119596476/21fb7a10-151e-4e30-9f73-305e6b73d927)
