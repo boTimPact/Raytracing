@@ -70,3 +70,5 @@ Path tracing for soft shadows, Triangle mesh, Skyspheres
 ![Raytracing](https://github.com/boTimPact/Raytracing/assets/119596476/a0947635-6d28-45c7-9d00-b5943870d9dc)
 
 ![Raytracing2](https://github.com/boTimPact/Raytracing/assets/119596476/21fb7a10-151e-4e30-9f73-305e6b73d927)
+
+![Raytracing5](https://github.com/boTimPact/Raytracing/assets/119596476/98593df7-0ac7-4c79-8a21-4b9c66ba89b4)
