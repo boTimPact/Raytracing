@@ -82,6 +82,22 @@ public class VectorF {
         return out;
     }
 
+    public VectorF componentReciprocal(){
+        VectorF out = new VectorF(0,0,0);
+        out.x = 1 / this.x;
+        out.y = 1 / this.y;
+        out.z = 1 / this.z;
+        return out;
+    }
+
+    public float maxValue(){
+        return Math.max(this.x,Math.max(this.y,this.z));
+    }
+
+    public float minValue(){
+        return Math.min(this.x,Math.min(this.y,this.z));
+    }
+
     //Kreuzprodukt
     public VectorF cross(VectorF other){
         VectorF out = new VectorF(1,1,1);

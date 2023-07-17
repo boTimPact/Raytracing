@@ -17,6 +17,8 @@ public class Raytracer {
 
     public Camera_ImageLayer cam_Image;
     List<Figure> objects = new LinkedList<>();
+    BVH bvh;
+    ImageReader skyDome;
     List<LightSource> lights;
     JFrame frame;
     JLabel imageLabel;
@@ -27,14 +29,14 @@ public class Raytracer {
 
     private static final int WIDTH = 1920;
     private static final int HEIGHT = 1080;
-    private static final int RECURSIONDEPTH = 5;
+    private static final int RECURSION_DEPTH = 5;
+    public static int ADDITIONAL_SHADOW_RAY_COUNT = 0;
     private static final int THREAD_NUMBER = Runtime.getRuntime().availableProcessors();
     private static final int CHUNK_SIZE = HEIGHT / THREAD_NUMBER;
 
 
     //TODO:
     // Constuctiv solid geometry Verschachtelung,
-    // weiche Schatten,
     // Lichtkegel,
     // Metallness,
     // Optional:
@@ -55,10 +57,17 @@ public class Raytracer {
         pixels = new int[WIDTH * HEIGHT];
         cam_Image = new Camera_ImageLayer(WIDTH, HEIGHT);
         lights = new LinkedList<>();
-        lights.add(new LightSource(new VectorF(0,-5,15), new VectorF(1,1,1), 1f, 2.2f));
-        lights.add(new LightSource(new VectorF(5,10,10), new VectorF(1,1,1), 1f,2.2f));
+        lights.add(new LightSource(new VectorF(-15,-5, 0), new VectorF(1,1,1), 1f, 2.2f));
+
+        //Daylight
+        lights.add(new LightSource(new VectorF(0,100,-1000), new VectorF(1,1,1), 0.1f,2.2f));
+        lights.add(new LightSource(new VectorF(0,100,1000), new VectorF(1,1,1), 0.1f,2.2f));
+        lights.add(new LightSource(new VectorF(1000,100,0), new VectorF(1,1,1), 0.1f,2.2f));
+        lights.add(new LightSource(new VectorF(-1000,100,0), new VectorF(1,1,1), 0.1f,2.2f));
+        lights.add(new LightSource(new VectorF(0,-1000,0), new VectorF(1,1,1), 0.1f,2.2f));
 
         //region Object Init Region
+//        this.objects.add(new Sphere(new Material(new VectorF(0,0,1), 0.3f, 0, false, 0, Substance.SOLID), new VectorF(0,0,-2), 1));
             this.objects.add(new Sphere(new Material(new VectorF(0,0,1), 0.3f, 0, false, 0, Substance.SOLID), new VectorF(-3,0,-5), 2));
             this.objects.add(new Sphere(new Material(new VectorF(1,1,1), 0.04f, 0, true, 0, Substance.SOLID), new VectorF(3,0,-5), 2));
             this.objects.add(new Sphere(new Material(new VectorF(1,1,1), 0, 0, false, 0.99f, Substance.GLASS), new VectorF(-1,-1,0), 1));
@@ -66,23 +75,23 @@ public class Raytracer {
             this.objects.add(new Sphere(new Material(new VectorF(1,0.64f,0), 1, 0, false, 0, Substance.SOLID), new VectorF(0,1020,-1000), 980));
 
 
-    //        this.objects.add(new Quadric(0,0,0,0,0,0,0,1,0,-4, new Material(new VectorF(1,0,0),1,0)).translate(new VectorF(0,8,0)));
-
-    //        this.objects.add(new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0.6f,0,1), 0.3f,0, true, 0, Material.SUBSTANCE.GLASS)).scale(new VectorF(2,2,2)).translate(new VectorF(5,0,-10)));
+//            this.objects.add(new Quadric(0,0,0,0,0,0,0,1,0,-4, new Material(new VectorF(1,0,0),1,0)).translate(new VectorF(0,8,0)));
+//
+//            this.objects.add(new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0.6f,0,1), 0.3f,0, true, 0, Material.SUBSTANCE.GLASS)).scale(new VectorF(2,2,2)).translate(new VectorF(5,0,-10)));
 
             objects.add(new CSG.Union(
-                    new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(1,0,0), 0.2f,0, false, 0, Substance.SOLID)).scale(new VectorF(1.5f, 1.5f, 1.5f)).translate(new VectorF(0,-2,-3-3)),
-                    new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0,0,1), 0.9f,0, true, 0, Substance.SOLID)).translate(new VectorF(0.5f,-2,-2.5f-3)))
+                    new Sphere(new Material(new VectorF(1,0,0), 0.2f,0, false, 0, Substance.SOLID), new VectorF(0,-2,-3-3), 1.5f),
+                    new Sphere(new Material(new VectorF(0,0,1), 0.9f,0, true, 0, Substance.SOLID), new VectorF(0.5f,-2,-2.5f-3), 1))
             );
 
             objects.add(new CSG.Intersection(
-                    new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(1,0.84f,0), 0.2f,0, false, 0, Substance.SOLID)).translate(new VectorF(-0.35f,1.5f,-0.3f)),
-                    new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0,1,1), 0.5f,0, false, 0, Substance.SOLID)).translate(new VectorF(0.35f,1.5f,0f)))
+                    new Sphere(new Material(new VectorF(1,0.84f,0), 0.2f,0, false, 0, Substance.SOLID), new VectorF(-0.35f,1.5f,-0.3f), 1),
+                    new Sphere(new Material(new VectorF(0,1,1), 0.5f,0, false, 0, Substance.SOLID), new VectorF(0.35f,1.5f,0f), 1))
             );
 
             objects.add(new CSG.Differenz(
-                new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0.5f,1,0.5f), 0.8f,0, false, 0, Substance.SOLID)).scale(new VectorF(1.5f,1.5f,1.5f)).translate(new VectorF(-1,2.5f,-0.5f)).translate(new VectorF(8,-5f,-6)),
-                test.translate(new VectorF(8,-5f,-6)))
+                new Sphere(new Material(new VectorF(0.5f,1,0.5f), 0.8f,0, false, 0, Substance.SOLID), new VectorF(7,-2.5f,-6.5f), 1.5f),
+                new Sphere(new Material(new VectorF(1,1,0), 0.9f,0, true, 0, Substance.SOLID), new VectorF(7f,-2.7f,-6f), 1.2f))
             );
 
     //        objects.add(new Quadric(0,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0,0,1), 0.35f,0, true, 0)).rotate(new VectorF(0,0,1), -75).translate(new VectorF(-5,0,-10)));
@@ -92,7 +101,14 @@ public class Raytracer {
     //        ));
 
         //endregion R
+        OBJFileReader reader = new OBJFileReader();
+        List<Figure> triangles = reader.readFile("src/Assets/Models/Pawn_LowPoly.obj", new Material(new VectorF(0.2f,0.1f,0.007f), 0.4f,0, false, 0, Substance.SOLID), new Matrix4f().translate(-17,-3,-150).rotateY(45).rotateX(-20).rotateZ(180));
+        BVH mesh = new BVH(triangles);
+        this.objects.add(mesh.root);
 
+        bvh = new BVH(objects);
+        skyDome = new ImageReader("src/Assets/Skysphere/kloppenheim_06_puresky_1k.png");
+        System.out.println("Setup complete!\nObjects: " + this.objects.size());
         frame = new JFrame();
         image = new MemoryImageSource(WIDTH, HEIGHT, new DirectColorModel(24, 0xff0000, 0xff00, 0xff), new int[WIDTH * HEIGHT], 0, WIDTH);
         imageLabel = new JLabel(new ImageIcon(Toolkit.getDefaultToolkit().createImage(image)));
@@ -161,23 +177,25 @@ public class Raytracer {
 
         IntersectionPoint intersectionPoint = null;
         float min = Float.POSITIVE_INFINITY;
-        int index = -1;
+
         for (int i = 0; i < objects.size(); i++) {
-            List<IntersectionPoint> tmpPoints = objects.get(i).intersects(ray);
+            List<IntersectionPoint> tmpPoints = objects.get(i).intersects(ray).stream().sorted((i1, i2) -> Float.compare(i1.intersection, i2.intersection)).toList(); //bvh.root.intersects(ray).stream().sorted((i1, i2) -> Float.compare(i1.intersection, i2.intersection)).toList(); //
             IntersectionPoint tmp = null;
-            if(!tmpPoints.isEmpty()) tmp = tmpPoints.get(0);
-            if(tmp != null && tmp.intersection != null && tmp.intersection < min && tmp.intersection > 0){
+            if (!tmpPoints.isEmpty()) tmp = tmpPoints.get(0);
+            if (tmp != null && tmp.intersection != null && tmp.intersection < min && tmp.intersection > 0) {
                 min = tmp.intersection;
-                index = i;
+
                 intersectionPoint = tmp;
             }
         }
+
         if(intersectionPoint == null) {
-            return new VectorF(0.01f,0.01f,0.01f);
+//            return new VectorF(0.01f,0.01f,0.01f);
+            return skyDome.getColorAtPoint(ray).multiplyScalar(0.5f);
         }
 
-        VectorF point = ray.pointOnRay(intersectionPoint.intersection);
-        VectorF normalVec = intersectionPoint.figure.getNormal(point, objects.get(index), intersectionPoint.figure);
+        VectorF point = intersectionPoint.point;
+        VectorF normalVec = intersectionPoint.normal;
 
         VectorF reflectColor = new VectorF(0,0,0);
         VectorF refractColor = new VectorF(0,0,0);
@@ -185,12 +203,8 @@ public class Raytracer {
 
         VectorF objColor = new VectorF(0,0,0);
         for (LightSource light: lights) {
-            VectorF lightColor = light.physicallyBasedLighting(point, objects.get(index), intersectionPoint.figure, ray.direction, intersectionPoint.figure.material.albedo);
-//            if(isInShadow(point, normalVec, light.pos)){
-//                lightColor = lightColor.multiplyScalar(0.1f);
-//            }
-            lightColor = lightColor.multiplyScalar(shadowFactor(point, normalVec, light, 10));
-//            System.out.println(shadowFactor(point, normalVec, light, 10));
+            VectorF lightColor = light.physicallyBasedLighting(point, normalVec, intersectionPoint.figure, ray.direction, intersectionPoint.figure.material.albedo);
+            lightColor = lightColor.multiplyScalar(shadowFactor(point, normalVec, light));
             objColor = objColor.add(lightColor);
         }
 
@@ -232,24 +246,26 @@ public class Raytracer {
     }
 
 
-    private float shadowFactor(VectorF point, VectorF normal, LightSource light, int shadowRayCount){
+    private float shadowFactor(VectorF point, VectorF normal, LightSource light){
         int count = 0;
 
-        for (VectorF lightpos: light.lightCheckers) {
-            if(isInShadow(point, normal, lightpos)){
+        for (VectorF lightPos: light.lightCheckers) {
+            if(isInShadow(point, normal, lightPos)){
                 count++;
             }
         }
-        return 1 - (count / (float) shadowRayCount);
+        return ADDITIONAL_SHADOW_RAY_COUNT == 0 ? 1 - count : 1 - (count / (float) ADDITIONAL_SHADOW_RAY_COUNT);
     }
 
     private boolean isInShadow(VectorF point, VectorF normal, VectorF lightPos){
         Ray toLight = new Ray(point.add(normal.multiplyScalar(0.002f)), lightPos.add(point.negate()));
+        float lightRayMagnitude = toLight.direction.magnitude();
         for (int i = 0; i < objects.size(); i++) {
             List<IntersectionPoint> tmpPoints = objects.get(i).intersects(toLight);
             if(!tmpPoints.isEmpty()){
+
                 for (int j = 0; j < tmpPoints.size(); j++) {
-                    if(tmpPoints.get(j).intersection > 0 && toLight.direction.magnitude() < tmpPoints.get(j).intersection && tmpPoints.get(j).figure.material.substance == Substance.SOLID){
+                    if(tmpPoints.get(j).intersection > 0 && lightRayMagnitude < tmpPoints.get(j).intersection && tmpPoints.get(j).figure.material.substance == Substance.SOLID){
                         return true;
                     }
                 }
@@ -294,7 +310,7 @@ public class Raytracer {
                 for (int x = 0; x < WIDTH; ++x) {
                     Ray ray = cam_Image.rayToImageLayer(x, y, WIDTH, HEIGHT);
 
-                    VectorF color = getColor(ray, RECURSIONDEPTH);
+                    VectorF color = getColor(ray, RECURSION_DEPTH);
                     color = gammaCorrectionUp(color, 2.2f);
                     color = color.multiplyScalar(255);
                     pixels[y * WIDTH + x] = (0xFF << 24) | ((int)color.x << 16) | ((int)color.y << 8) | (int) color.z;

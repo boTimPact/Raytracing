@@ -95,7 +95,7 @@ public class Matrix4f {
 
 	public Matrix4f rotateX(float angle) {
 		// TODO Rotation um X-Achse zu this hinzufügen
-		//angle = (float)Math.toRadians((double)angle);
+		angle = (float) Math.toRadians(angle);
 		Matrix4f out = new Matrix4f();
 		out.matrix = new float[][]{{1,0,0,0},{0,(float)Math.cos(angle),(float)-Math.sin(angle),0},{0,(float)Math.sin(angle),(float)Math.cos(angle),0},{0,0,0,1}};
 
@@ -104,6 +104,7 @@ public class Matrix4f {
 
 	public Matrix4f rotateY(float angle) {
 		// TODO Rotation um Y-Achse zu this hinzufügen
+		angle = (float) Math.toRadians(angle);
 		Matrix4f out = new Matrix4f();
 		out.matrix = new float[][]{{(float)Math.cos(angle),0,(float)-Math.sin(angle),0},{0,1,0,0},{(float)Math.sin(angle),0,(float)Math.cos(angle),0},{0,0,0,1}};
 
@@ -112,6 +113,7 @@ public class Matrix4f {
 
 	public Matrix4f rotateZ(float angle) {
 		// TODO Rotation um Z-Achse zu this hinzufügen
+		angle = (float) Math.toRadians(angle);
 		Matrix4f out = new Matrix4f();
 		out.matrix = new float[][]{{(float)Math.cos(angle),(float)-Math.sin(angle),0,0}, {(float)Math.sin(angle),(float)Math.cos(angle),0,0}, {0,0,1,0}, {0,0,0,1}};
 
