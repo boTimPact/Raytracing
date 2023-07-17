@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.*;
-import java.util.stream.Collectors;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -103,7 +102,7 @@ public class Raytracer {
 
         //endregion R
         OBJFileReader reader = new OBJFileReader();
-        List<Figure> triangles = reader.readFile("src/Assets/Models/Pawn_LowPoly.obj", new Material(new VectorF(1,1,1), 0.4f,0, false, 0, Substance.SOLID), new Matrix4f().translate(-17,-3,-150).rotateY(45).rotateX(-20).rotateZ(180));
+        List<Figure> triangles = reader.readFile("src/Assets/Models/Pawn_LowPoly.obj", new Material(new VectorF(0.2f,0.1f,0.007f), 0.4f,0, false, 0, Substance.SOLID), new Matrix4f().translate(-17,-3,-150).rotateY(45).rotateX(-20).rotateZ(180));
         BVH mesh = new BVH(triangles);
         this.objects.add(mesh.root);
 

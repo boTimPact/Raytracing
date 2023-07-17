@@ -54,7 +54,7 @@ public class BoundingBox extends Figure{
         if(listA.isEmpty() && listB.isEmpty()) return new LinkedList<>();
         if(listA.isEmpty()) return listB;
         if(listB.isEmpty()) return listA;
-//        return listA.get(0).intersection < listB.get(0).intersection ? listA : listB;
+//        return listA.get(0).intersection < listB.get(0).intersection && listA.get(0).intersection > 0 && listB.get(0).intersection > 0 ? listA : listB;
         listA.addAll(listB);
         return listA;
     }
