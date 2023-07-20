@@ -3,11 +3,11 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
-public class ImageReader {
+public class Skydome {
     //int[] pixels;
     BufferedImage bufferedImage;
 
-    public ImageReader(String filename) {
+    public Skydome(String filename) {
         File hdrTexture = new File(filename);
         try {
             bufferedImage = ImageIO.read(hdrTexture);
@@ -28,6 +28,13 @@ public class ImageReader {
         float r = (color >> 16 & 0xFF) / 255f;
         float g = (color >> 8 & 0xFF) / 255f;
         float b = (color & 0xFF) / 255f;
-        return new VectorF(r,g,b); //0.01f,0.01f,0.01f
+        return gammaCorrectionDown(new VectorF(r,g,b), 2.2f); //0.01f,0.01f,0.01f
+    }
+
+    private VectorF gammaCorrectionDown(VectorF light, float gamma){
+        light.x = (float) Math.pow(light.x, gamma);
+        light.y = (float) Math.pow(light.y, gamma);
+        light.z = (float) Math.pow(light.z, gamma);
+        return light;
     }
 }

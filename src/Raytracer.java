@@ -18,7 +18,7 @@ public class Raytracer {
     public Camera_ImageLayer cam_Image;
     List<Figure> objects = new LinkedList<>();
     BVH bvh;
-    ImageReader skyDome;
+    Skydome skyDome;
     List<LightSource> lights;
     JFrame frame;
     JLabel imageLabel;
@@ -75,7 +75,7 @@ public class Raytracer {
             this.objects.add(new Sphere(new Material(new VectorF(1,0.64f,0), 1, 0, false, 0, Substance.SOLID), new VectorF(0,1020,-1000), 980));
 
 
-//            this.objects.add(new Quadric(0,0,0,0,0,0,0,1,0,-4, new Material(new VectorF(1,0,0),1,0)).translate(new VectorF(0,8,0)));
+//            this.objects.add(new Quadric(0,0,0,0,0,0,0,1,0,-4, new Material(new VectorF(1,0,0),1,0, false, 0, Substance.SOLID)).translate(new VectorF(0,8,0)));
 //
 //            this.objects.add(new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0.6f,0,1), 0.3f,0, true, 0, Material.SUBSTANCE.GLASS)).scale(new VectorF(2,2,2)).translate(new VectorF(5,0,-10)));
 
@@ -100,14 +100,15 @@ public class Raytracer {
     //                new Quadric(0,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0,0,1), 0.2f,0)).rotate(new VectorF(0,0,1), -75).rotate(new VectorF(1,0,0), 20).translate(new VectorF(-5,0,-10))
     //        ));
 
-        //endregion R
+        //endregion Object Init
+
         OBJFileReader reader = new OBJFileReader();
         List<Figure> triangles = reader.readFile("src/Assets/Models/Pawn_LowPoly.obj", new Material(new VectorF(0.2f,0.1f,0.007f), 0.4f,0, false, 0, Substance.SOLID), new Matrix4f().translate(-17,-3,-150).rotateY(45).rotateX(-20).rotateZ(180));
         BVH mesh = new BVH(triangles);
         this.objects.add(mesh.root);
 
         bvh = new BVH(objects);
-        skyDome = new ImageReader("src/Assets/Skysphere/kloppenheim_06_puresky_1k.png");
+        skyDome = new Skydome("src/Assets/Skysphere/kloppenheim_06_puresky_1k.png");
         System.out.println("Setup complete!\nObjects: " + this.objects.size());
         frame = new JFrame();
         image = new MemoryImageSource(WIDTH, HEIGHT, new DirectColorModel(24, 0xff0000, 0xff00, 0xff), new int[WIDTH * HEIGHT], 0, WIDTH);
@@ -142,7 +143,7 @@ public class Raytracer {
 //        }
 //        light.pos.x = -offset;
 //        light.pos.y = offset;
-        Matrix4f rotMat = new Matrix4f().rotateY(delta);
+        Matrix4f rotMat = new Matrix4f().rotateY(50 * delta);
         lights.get(0).pos = lights.get(0).pos.multiplyMatrix(rotMat);
 
 //        Sphere moveing = (Sphere)objects.get(2);

@@ -44,6 +44,13 @@ public class BoundingBox extends Figure{
             tzmax = (z[1-sign[2]] - ray.origin.z) * invDirection.z;
 
             if ((tmin > tzmax) || (tzmin > tmax)) return new ArrayList<>();
+
+//                float s1 = new VectorF(x[0], y[0], z[0]).add(ray.origin.negate()).multiplyLineByLine(ray.direction.componentReciprocal()).maxValue();
+//                float s2 = new VectorF(x[1], y[1], z[1]).add(ray.origin.negate()).multiplyLineByLine(ray.direction.componentReciprocal()).minValue();
+//
+//                if(s2 < s1 || s2 < 0){
+//                    return new LinkedList<>();
+//                }
 //        }
 
         List<IntersectionPoint> listA = new ArrayList<>();
