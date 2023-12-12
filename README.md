@@ -43,26 +43,26 @@ Covered Topics:
 ### 1. Iteration
 Simple raytracer for rendering spheres with diffuse illumination
 <picture>
-  <source srcset="https://github.com/boTimPact/Raytracing/blob/master/Pictures/Raytracing_Ue1.png?raw=true">
-  <img alt="Basic Raytracer render showing 3 spheres with diffuse lighting" src="https://github.com/boTimPact/Raytracing/blob/master/Pictures/Raytracing_Ue1.png?raw=true">
+  <source srcset="https://github.com/boTimPact/Raytracing/blob/main/Pictures/Raytracing_Ue1.png?raw=true">
+  <img alt="Basic Raytracer render showing 3 spheres with diffuse lighting" src="https://github.com/boTimPact/Raytracing/blob/main/Pictures/Raytracing_Ue1.png?raw=true">
 </picture>
 
 ### 2. Iteration
 Cook-Torrance lighting model with quadrics and CSGs
 <picture>
-  <source srcset="https://github.com/boTimPact/Raytracing/blob/master/Pictures/Raytracing_Ue2.png?raw=true">
-  <img alt="Raytraced render showing Quadrics and Constructive Solid Geometry and the Cook-Torrance ilumination model" src="https://github.com/boTimPact/Raytracing/blob/master/Pictures/Raytracing_Ue2.png?raw=true">
+  <source srcset="https://github.com/boTimPact/Raytracing/blob/main/Pictures/Raytracing_Ue2.png?raw=true">
+  <img alt="Raytraced render showing Quadrics and Constructive Solid Geometry and the Cook-Torrance ilumination model" src="https://github.com/boTimPact/Raytracing/blob/main/Pictures/Raytracing_Ue2.png?raw=true">
 </picture>
 
 ### 3. Iteration
 Shadows, reflections, transparency and refractions
 <picture>
-  <source srcset="https://github.com/boTimPact/Raytracing/blob/master/Pictures/Raytracing_Ue3_P1.png?raw=true">
-  <img alt="Raytraced render showcasing reflections and refractions with lightsource shining directly onto Objects" src="https://github.com/boTimPact/Raytracing/blob/master/Pictures/Raytracing_Ue3_P1.png?raw=true">
+  <source srcset="https://github.com/boTimPact/Raytracing/blob/main/Pictures/Raytracing_Ue3_P1.png?raw=true">
+  <img alt="Raytraced render showcasing reflections and refractions with lightsource shining directly onto Objects" src="https://github.com/boTimPact/Raytracing/blob/main/Pictures/Raytracing_Ue3_P1.png?raw=true">
 </picture>
 <picture>
-  <source srcset="https://github.com/boTimPact/Raytracing/blob/master/Pictures/Raytracing_Ue3_P2.png?raw=true">
-  <img alt="Raytraced render showcasing reflections and refractions with lightsource behind Objects"      src="https://github.com/boTimPact/Raytracing/blob/master/Pictures/Raytracing_Ue3_P2.png?raw=true">
+  <source srcset="https://github.com/boTimPact/Raytracing/blob/main/Pictures/Raytracing_Ue3_P2.png?raw=true">
+  <img alt="Raytraced render showcasing reflections and refractions with lightsource behind Objects"      src="https://github.com/boTimPact/Raytracing/blob/main/Pictures/Raytracing_Ue3_P2.png?raw=true">
 </picture>
 
 ### 4. Iteration
