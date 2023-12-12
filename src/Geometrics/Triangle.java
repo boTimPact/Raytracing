@@ -1,11 +1,17 @@
+package Geometrics;
+
 import java.util.*;
 
-public class Triangle extends Figure{
+import Material.Material;
+import Math.*;
+import Geometrics.Figure;
+
+public class Triangle extends Figure {
     VectorF[] vertices;
     VectorF normal;
 
-    public Triangle(Material material,VectorF vertex1, VectorF vertex2, VectorF vertex3, Matrix4f transformation) {
-        this.material = material;   //new Material(new VectorF((float) Math.random(),(float) Math.random(),(float) Math.random()), 0.4f,0, false, 0, Substance.SOLID);//
+    public Triangle(Material material, VectorF vertex1, VectorF vertex2, VectorF vertex3, Matrix4f transformation) {
+        this.material = material;   //new Material.Material(new Math.VectorF((float) Math.random(),(float) Math.random(),(float) Math.random()), 0.4f,0, false, 0, Material.Substance.SOLID);//
         this.vertices = new VectorF[]{vertex1.multiplyMatrix(transformation), vertex2.multiplyMatrix(transformation), vertex3.multiplyMatrix(transformation)};
         calcNormal();
     }
@@ -56,7 +62,7 @@ public class Triangle extends Figure{
     }
 
     @Override
-    VectorF getNormal(VectorF point, Figure figure, Figure intersectionFigure) {
+    public VectorF getNormal(VectorF point, Figure figure, Figure intersectionFigure) {
         return this.normal;
     }
 

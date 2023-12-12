@@ -1,7 +1,9 @@
-import java.awt.geom.Point2D;
-import java.util.*;
+package Geometrics;
 
-abstract class CSG extends Figure{
+import java.util.*;
+import Math.*;
+
+public abstract class CSG extends Figure {
 
     Figure a;
     Figure b;
@@ -28,7 +30,7 @@ abstract class CSG extends Figure{
         }
 
         @Override
-        List<IntersectionPoint> intersects(Ray ray) {
+        public List<IntersectionPoint> intersects(Ray ray) {
             List<IntersectionPoint> out = new LinkedList<>();
 
             List<IntersectionPoint> intersectionPoints = new LinkedList<>();
@@ -51,7 +53,7 @@ abstract class CSG extends Figure{
         }
 
         @Override
-        VectorF getNormal(VectorF point, Figure figure, Figure intersectionFigure) {
+        public VectorF getNormal(VectorF point, Figure figure, Figure intersectionFigure) {
             return null;
         }
     }
@@ -62,7 +64,7 @@ abstract class CSG extends Figure{
         }
 
         @Override
-        List<IntersectionPoint> intersects(Ray ray) {
+        public List<IntersectionPoint> intersects(Ray ray) {
             List<IntersectionPoint> out = new LinkedList<>();
 
             List<IntersectionPoint> intersectionPointsA = a.intersects(ray);
@@ -89,7 +91,7 @@ abstract class CSG extends Figure{
         }
 
         @Override
-        VectorF getNormal(VectorF point, Figure figure, Figure intersectionFigure) {
+        public VectorF getNormal(VectorF point, Figure figure, Figure intersectionFigure) {
             return null;
         }
     }
@@ -100,7 +102,7 @@ abstract class CSG extends Figure{
         }
 
         @Override
-        List<IntersectionPoint> intersects(Ray ray) {
+        public List<IntersectionPoint> intersects(Ray ray) {
             List<IntersectionPoint> out = new LinkedList<>();
 
             List<IntersectionPoint> intersectionPointsA = a.intersects(ray);
@@ -145,7 +147,7 @@ abstract class CSG extends Figure{
         }
 
         @Override
-        VectorF getNormal(VectorF point, Figure figure, Figure intersectionFigure) {
+        public VectorF getNormal(VectorF point, Figure figure, Figure intersectionFigure) {
             return null;
         }
     }

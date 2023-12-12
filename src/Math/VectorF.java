@@ -1,3 +1,5 @@
+package Math;
+
 import java.util.Objects;
 
 public class VectorF {
@@ -156,7 +158,7 @@ public class VectorF {
 
     @Override
     public String toString() {
-        return "VectorF{" +
+        return "Math.VectorF{" +
                 "x=" + x +
                 ", y=" + y +
                 ", z=" + z +

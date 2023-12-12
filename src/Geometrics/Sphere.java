@@ -1,7 +1,12 @@
+package Geometrics;
+
 import java.util.LinkedList;
 import java.util.List;
 
-public class Sphere extends  Figure{
+import Material.Material;
+import Math.*;
+
+public class Sphere extends Figure {
 
     public VectorF mid;
 

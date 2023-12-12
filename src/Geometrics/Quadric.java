@@ -1,8 +1,13 @@
+package Geometrics;
+
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 
-public class Quadric extends Figure{
+import Material.Material;
+import Math.*;
+
+public class Quadric extends Figure {
 
     float a;
     float b;
@@ -115,7 +120,7 @@ public class Quadric extends Figure{
     }
 
 
-    VectorF getNormal(VectorF point, Figure figure, Figure intersectionFigure) {
+    public VectorF getNormal(VectorF point, Figure figure, Figure intersectionFigure) {
         return new VectorF(this.a * point.x + this.d * point.y + this.e * point.z + this.g, this.b * point.y + this.d * point.x + this.f * point.z + this.h, this.c * point.z + this.e * point.x + this.f * point.y + this.i).normalize();
     }
 

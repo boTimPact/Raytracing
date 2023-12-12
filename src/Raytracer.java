@@ -1,4 +1,8 @@
 
+import Geometrics.*;
+import Material.*;
+import Math.*;
+import Geometrics.*;
 
 import java.awt.Image;
 import java.awt.Toolkit;
@@ -67,7 +71,7 @@ public class Raytracer {
         lights.add(new LightSource(new VectorF(0,-1000,0), new VectorF(1,1,1), 0.1f,2.2f));
 
         //region Object Init Region
-//        this.objects.add(new Sphere(new Material(new VectorF(0,0,1), 0.3f, 0, false, 0, Substance.SOLID), new VectorF(0,0,-2), 1));
+//        this.objects.add(new Solids.Sphere(new Material.Material(new Math.VectorF(0,0,1), 0.3f, 0, false, 0, Material.Substance.SOLID), new Math.VectorF(0,0,-2), 1));
             this.objects.add(new Sphere(new Material(new VectorF(0,0,1), 0.3f, 0, false, 0, Substance.SOLID), new VectorF(-3,0,-5), 2));
             this.objects.add(new Sphere(new Material(new VectorF(1,1,1), 0.04f, 0, true, 0, Substance.SOLID), new VectorF(3,0,-5), 2));
             this.objects.add(new Sphere(new Material(new VectorF(1,1,1), 0, 0, false, 0.99f, Substance.GLASS), new VectorF(-1,-1,0), 1));
@@ -75,9 +79,9 @@ public class Raytracer {
             this.objects.add(new Sphere(new Material(new VectorF(1,0.64f,0), 1, 0, false, 0, Substance.SOLID), new VectorF(0,1020,-1000), 980));
 
 
-//            this.objects.add(new Quadric(0,0,0,0,0,0,0,1,0,-4, new Material(new VectorF(1,0,0),1,0)).translate(new VectorF(0,8,0)));
+//            this.objects.add(new Solids.Quadric(0,0,0,0,0,0,0,1,0,-4, new Material.Material(new Math.VectorF(1,0,0),1,0)).translate(new Math.VectorF(0,8,0)));
 //
-//            this.objects.add(new Quadric(1,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0.6f,0,1), 0.3f,0, true, 0, Material.SUBSTANCE.GLASS)).scale(new VectorF(2,2,2)).translate(new VectorF(5,0,-10)));
+//            this.objects.add(new Solids.Quadric(1,1,1,0,0,0,0,0,0,-1, new Material.Material(new Math.VectorF(0.6f,0,1), 0.3f,0, true, 0, Material.Material.SUBSTANCE.GLASS)).scale(new Math.VectorF(2,2,2)).translate(new Math.VectorF(5,0,-10)));
 
             objects.add(new CSG.Union(
                     new Sphere(new Material(new VectorF(1,0,0), 0.2f,0, false, 0, Substance.SOLID), new VectorF(0,-2,-3-3), 1.5f),
@@ -94,10 +98,10 @@ public class Raytracer {
                 new Sphere(new Material(new VectorF(1,1,0), 0.9f,0, true, 0, Substance.SOLID), new VectorF(7f,-2.7f,-6f), 1.2f))
             );
 
-    //        objects.add(new Quadric(0,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0,0,1), 0.35f,0, true, 0)).rotate(new VectorF(0,0,1), -75).translate(new VectorF(-5,0,-10)));
-    //        objects.add(new CSG.Intersection(
-    //                new Quadric(0,0,0,0,0,0,0,-1,0,-8, new Material(new VectorF(1,0,0),1,0)).rotate(new VectorF(1,0,0), 20),
-    //                new Quadric(0,1,1,0,0,0,0,0,0,-1, new Material(new VectorF(0,0,1), 0.2f,0)).rotate(new VectorF(0,0,1), -75).rotate(new VectorF(1,0,0), 20).translate(new VectorF(-5,0,-10))
+    //        objects.add(new Solids.Quadric(0,1,1,0,0,0,0,0,0,-1, new Material.Material(new Math.VectorF(0,0,1), 0.35f,0, true, 0)).rotate(new Math.VectorF(0,0,1), -75).translate(new Math.VectorF(-5,0,-10)));
+    //        objects.add(new Geometrics.CSG.Intersection(
+    //                new Solids.Quadric(0,0,0,0,0,0,0,-1,0,-8, new Material.Material(new Math.VectorF(1,0,0),1,0)).rotate(new Math.VectorF(1,0,0), 20),
+    //                new Solids.Quadric(0,1,1,0,0,0,0,0,0,-1, new Material.Material(new Math.VectorF(0,0,1), 0.2f,0)).rotate(new Math.VectorF(0,0,1), -75).rotate(new Math.VectorF(1,0,0), 20).translate(new Math.VectorF(-5,0,-10))
     //        ));
 
         //endregion R
@@ -131,7 +135,7 @@ public class Raytracer {
     }
 
     float offset = 0;
-    float delta = 0.03f;
+    float delta = 1f;
 
     public void update(){
         List<Future> tasks = new ArrayList<>();
@@ -145,7 +149,7 @@ public class Raytracer {
         Matrix4f rotMat = new Matrix4f().rotateY(delta);
         lights.get(0).pos = lights.get(0).pos.multiplyMatrix(rotMat);
 
-//        Sphere moveing = (Sphere)objects.get(2);
+//        Solids.Sphere moveing = (Solids.Sphere)objects.get(2);
 //        moveing.mid.y = offset;
 
         for (int i = 0; i < THREAD_NUMBER; i++) {
@@ -190,7 +194,7 @@ public class Raytracer {
         }
 
         if(intersectionPoint == null) {
-//            return new VectorF(0.01f,0.01f,0.01f);
+//            return new Math.VectorF(0.01f,0.01f,0.01f);
             return skyDome.getColorAtPoint(ray).multiplyScalar(0.5f);
         }
 

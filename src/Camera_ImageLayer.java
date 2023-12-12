@@ -1,3 +1,5 @@
+import Math.*;
+
 public class Camera_ImageLayer {
     //Camera
     public VectorF pos;

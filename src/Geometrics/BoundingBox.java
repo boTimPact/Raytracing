@@ -1,9 +1,13 @@
+package Geometrics;
+
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
+import Math.*;
 
-public class BoundingBox extends Figure{
+
+public class BoundingBox extends Figure {
     Figure a;
     Figure b;
     float x[];
@@ -19,7 +23,7 @@ public class BoundingBox extends Figure{
     }
 
     @Override
-    List<IntersectionPoint> intersects(Ray ray) {
+    public List<IntersectionPoint> intersects(Ray ray) {
 
 //        if(!(ray.origin.x > x[0] && ray.origin.x < x[1] && ray.origin.y > y[0] && ray.origin.y < y[1] && ray.origin.z > z[0] && ray.origin.z < z[1])) {
              int[] sign = new int[]{ray.direction.x < 0 ? 1 : 0, ray.direction.y < 0 ? 1 : 0, ray.direction.z < 0 ? 1 : 0};
@@ -60,7 +64,7 @@ public class BoundingBox extends Figure{
     }
 
     @Override
-    VectorF getNormal(VectorF point, Figure figure, Figure intersectionFigure) {
+    public VectorF getNormal(VectorF point, Figure figure, Figure intersectionFigure) {
         return null;
     }
 }

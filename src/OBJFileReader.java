@@ -4,6 +4,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
 
+import Geometrics.Triangle;
+import Material.Material;
+import Math.*;
+import Geometrics.Figure;
+
 public class OBJFileReader {
 
     public List<Figure> readFile(String path, Material material, Matrix4f transform) {

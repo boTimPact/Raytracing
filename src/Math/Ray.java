@@ -1,3 +1,6 @@
+package Math;
+
+import Math.*;
 public class Ray {
     public VectorF origin;
     public VectorF direction;
@@ -15,7 +18,7 @@ public class Ray {
 
     @Override
     public String toString() {
-        return "Ray{" +
+        return "Math.Ray{" +
                 "origin=" + origin +
                 ", direction=" + direction +
                 '}';

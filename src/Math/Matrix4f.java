@@ -1,4 +1,4 @@
-import java.util.Arrays;
+package Math;
 
 //Alle Operationen ändern das Matrixobjekt selbst und geben das eigene Matrixobjekt zurück
 //Dadurch kann man Aufrufe verketten, z.B.

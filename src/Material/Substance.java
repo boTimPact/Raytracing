@@ -1,3 +1,5 @@
+package Material;
+
 public enum Substance {
     GLASS(1.5f),
     WATER(1.3f),

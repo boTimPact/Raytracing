@@ -1,7 +1,7 @@
 # Raytracing
 _English version below_
 
-## Dieses Projekt ist im Zuge des Kurses GTAT1 Game Technology & Interactive Systems: Ray Tracing entstanden
+## Dieses Projekt ist im Zuge des Kurses GTAT1 Game Technology & Interactive Systems: Math.Ray Tracing entstanden
 
 Im Praxisteil der Veranstaltung musste der gelernte Stoff in einem eigenen Raytracer implementiert werden.
 
@@ -21,7 +21,7 @@ Behandelte Themen:
 
 
 _English version_
-## This project was created as part of the GTAT1 Game Technology & Interactive Systems: Ray Tracing course.
+## This project was created as part of the GTAT1 Game Technology & Interactive Systems: Math.Ray Tracing course.
 
 In the practical part of the course, the material learned had to be implemented in an own ray tracer.
 
@@ -29,9 +29,9 @@ Covered Topics:
 - Image generation through ray tracing
 - Basic camera function
 - Light sources
-- Material properties
+- Material.Material properties
 - Mathematical representation of solids: spheres / quadrics & transformations (translation, rotation, scaling)
-- Constructive Solid Geometry(CSG) - union, intersection, difference
+- Constructive Solid Geometry(Geometrics.CSG) - union, intersection, difference
 - Illumination model with Cook-Torrance
 - Shadow, reflection & refraction rays
 - Transparency & Refractive Index
@@ -66,7 +66,7 @@ Shadows, reflections, transparency and refractions
 </picture>
 
 ### 4. Iteration
-Path tracing for soft shadows, Triangle mesh, Skyspheres
+Path tracing for soft shadows, Geometrics.Triangle mesh, Skyspheres
 ![Raytracing](https://github.com/boTimPact/Raytracing/assets/119596476/a0947635-6d28-45c7-9d00-b5943870d9dc)
 
 ![Raytracing2](https://github.com/boTimPact/Raytracing/assets/119596476/21fb7a10-151e-4e30-9f73-305e6b73d927)

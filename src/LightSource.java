@@ -1,5 +1,8 @@
 import java.util.ArrayList;
 import java.util.List;
+import Math.*;
+import Geometrics.*;
+import Material.*;
 
 public class LightSource {
 
@@ -57,7 +60,7 @@ public class LightSource {
         if(normal.dot(lightDirection) < 0) return new VectorF(0,0,0);
 
         VectorF reflectivity = intersectionFigure.material.albedo.multiplyScalar(intersectionFigure.material.metallness).add(new VectorF(0.04f, 0.04f, 0.04f).multiplyScalar(1 - intersectionFigure.material.metallness));
-        //VectorF reflectivity = intersectionFigure.material.metallness > 0 ? intersectionFigure.material.albedo : new VectorF(0.04f,0.04f,0.04f);
+        //Math.VectorF reflectivity = intersectionFigure.material.metallness > 0 ? intersectionFigure.material.albedo : new Math.VectorF(0.04f,0.04f,0.04f);
 
         VectorF f = fresnel(normal.dot(view.normalize()), reflectivity); //* intersectionFigure.material.reflectivity
         float d = normalDistribution(normal.dot(h), intersectionFigure.material.roughness);
@@ -67,7 +70,7 @@ public class LightSource {
         VectorF ks = f.multiplyScalar(d * g);
         VectorF kd = new VectorF(1,1,1).add(ks.negate()).multiplyScalar(1 - intersectionFigure.material.metallness);
 
-        //VectorF light = new VectorF(1,1,1).multiplyScalar(ks);
+        //Math.VectorF light = new Math.VectorF(1,1,1).multiplyScalar(ks);
         VectorF light = this.color.multiplyScalar(brightness * normal.dot(lightDirection.normalize())).multiplyLineByLine(albedo.multiplyLineByLine(kd).add(ks));
 
         light = light.clamp(1,0);

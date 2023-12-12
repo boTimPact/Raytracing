@@ -1,8 +1,12 @@
+package Math;
+
+import Geometrics.Figure;
+
 public class IntersectionPoint {
-    Float intersection;
-    VectorF point;
-    Figure figure;
-    VectorF normal;
+    public Float intersection;
+    public VectorF point;
+    public Figure figure;
+    public VectorF normal;
 
     public IntersectionPoint(Float intersection, VectorF point, Figure figure, VectorF normal) {
         this.intersection = intersection;
