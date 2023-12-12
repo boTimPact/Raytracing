@@ -2,7 +2,6 @@
 import Geometrics.*;
 import Material.*;
 import Math.*;
-import Geometrics.*;
 
 import java.awt.Image;
 import java.awt.Toolkit;
